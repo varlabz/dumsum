@@ -1,5 +1,6 @@
 import requests
 import argparse
+import json
 
 url = "https://linkedin-data-scraper.p.rapidapi.com/search_jobs"
 
@@ -28,7 +29,12 @@ def main():
 
     response = requests.post(url, json=payload, headers=headers)
 
-    print(response.json())
+    if response.status_code == 200:
+        jobs = response.json()
+        for job in jobs['elements']:
+            print(job['jobDescription'])
+    else:
+        print("Failed to retrieve data")
 
 if __name__ == '__main__':
     main()
