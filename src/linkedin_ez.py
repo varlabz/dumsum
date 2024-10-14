@@ -28,11 +28,11 @@ def main():
     }
 
     response = requests.post(url, json=payload, headers=headers)
-
     if response.status_code == 200:
-        jobs = response.json()
-        for job in jobs['elements']:
-            print(job['jobDescription'])
+        jobs = response.json().response
+        print(jobs)
+        # for job in jobs:
+        #     print(job['jobDescription'])
     else:
         print("Failed to retrieve data")
 
