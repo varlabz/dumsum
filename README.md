@@ -5,6 +5,11 @@ Mac OS
 open -a "Google Chrome.app" --args --remote-debugging-port=9222
 ```
 
+### check chrome parameters and check "Command Line:" for  --remote-debugging-port=9222
+```
+chrome://version/
+```
+
 ### check in browser if debugging avaliable
 
 http://localhost:9222/json/version/ with response like

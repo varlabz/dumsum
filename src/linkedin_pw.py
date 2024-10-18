@@ -1,35 +1,45 @@
+import os
 from playwright.sync_api import sync_playwright, Playwright
+
+def if_locator_exists(page, selector):
+    return page.locator(selector).count() > 0
 
 def optional_locator(page, field, callback):
     try:
+        if not if_locator_exists(page, field):
+            return None
+        
         e = page.locator(field)
         # print(f"### optional_locator: {e} for {field}")
         if e is None:
             return None     
         callback(e)
         return e 
-    except Exception:
-        pass
+    except Exception as ex:
+        print(f"error: {ex}")
+
     return None
 
 def easy_apply_form(page) -> bool:
     print(">>> start easy apply form")
     while True:
         try:
+            page.wait_for_timeout(3_000)
             page.wait_for_selector('div[role="dialog"]', state="visible")
             dialog = page.locator('div[role="dialog"]')
             # check empty fields if have any then stop
-            req = dialog.locator('input[required]').all()
-            print(f"# required: {len(req)}")
+            # req = dialog.locator('input[required]').all()
+            # print(f"# required: {len(req)}")
             # for i in req:
             #     if not i.input_value().strip():
             #         print(f"required field is empty: {i}")
 
             if optional_locator(dialog, 'button >> span:text-is("Next")', lambda x: x.click()):
-                page.wait_for_timeout(2_000)
+                print(">>> next")
                 continue
 
             if optional_locator(dialog, 'button >> span:text-is("Review")', lambda x: x.click()):
+                print(">>> review")
                 continue
 
             ## optional_locator(dialog, 'input[id="follow-company-checkbox"][type="checkbox"]',   ## doesn't work use hack with javascript
@@ -38,47 +48,55 @@ def easy_apply_form(page) -> bool:
             optional_locator(dialog, 'input[id="follow-company-checkbox"][type="checkbox"]',
                             lambda x: print(f"### follow checkbox {x.is_checked()}"))
             if optional_locator(dialog, 'button >> span:text-is("Submit application")', lambda x: x.click()):
+                print(">>> submit")
                 return True
-        except Exception:
+
+        except Exception as ex:
+            print(f"error: {ex}")
             return False
 
+def get_job_title(page):
+    return ' '.join(page.locator('a.job-card-list__title').text_content().split())
 
 def job_positions(page):
     list = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
     print(f"# positions: {len(list)}")
     for i in list:
+        if if_locator_exists(i, 'button[aria-label$="job is dismissed, undo"]'):
+            print(f">>> skip: {get_job_title(i)}")
+            continue
         # print(f'>>> position {i.locator('a[label]')}')
         i.click()
         page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')
         try:
             ea = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
-        except (TimeoutError, IndexError):
+        except (TimeoutError, IndexError) as ex:
             continue
 
         # print(f"easy apply:: {ea}")
-        print(f">>> use '{' '.join(i.locator('a.job-card-list__title').text_content().split())}'", )    
+        print(f">>> use '{get_job_title(i)}'", )    
         ea.click()
         page.wait_for_timeout(1_000)
         if easy_apply_form(page):
             print(">>> easy apply form done")
-            i.locator('button.job-card-container__action-small').click() # want to not show the position again, click on cross
             try:
-                page.wait_for_timeout(1_000)
-                page.wait_for_selector('div[role="dialog"]', timeout=20_000)
-                # page.get_by_text('Application sent').locator('button[aria-label="Dismiss"]').click()
+                page.wait_for_timeout(3_000)
+                page.wait_for_selector('div[role="dialog"]')
                 page.locator('div[role="dialog"]').locator('button[aria-label="Dismiss"]').click()
-                # page.locator('div[role="dialog"][data-test-modal]').locator('button[aria-label="Dismiss"]').click()
-                # page.locator('div[role="dialog"][data-test-modal]').locator('button >> span:text-is("Dismiss")').click()
-            except TimeoutError:
-                print(">>> easy apply continue")
+            except Exception as ex:
+                print(f"error: {ex}")
+            i.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
+            print(">>> don't show position again")
+            print(">>> easy apply continue")
         else:
             print(">>> easy apply form failed")
-        print(">>> next")
+
+        print(">>> next position")
 
 def run(playwright: Playwright):
-    chromium = playwright.chromium # or "firefox" or "webkit".
-    browser = chromium.connect_over_cdp("http://host.docker.internal:9222") # 'http://localhost:9222') # 
+    chromium = playwright.chromium 
+    browser = chromium.connect_over_cdp(os.getenv('CDP_HOST', 'http://localhost:9222'))
     for page in browser.contexts[0].pages:
         if page.url.startswith('https://www.linkedin.com/jobs/'):
             job_positions(page)
