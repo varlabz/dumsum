@@ -2,7 +2,7 @@
 
 Mac OS
 ```
-open -a "Google Chrome.app" --args --remote-debugging-port=9222
+open -a "Google Chrome.app" --args --remote-debugging-port=9222 --remote-debugging-address=0.0.0.0
 ```
 
 ### check chrome parameters and check "Command Line:" for  --remote-debugging-port=9222
@@ -29,4 +29,4 @@ http://localhost:9222/json/version/ with response like
 ### build docker and run docker
 - docker build -t linkedin-pw .
 - docker build -t linkedin-pw https://github.com/username/repository.git
-- docker run -it --rm --add-host host.docker.internal:192.168.65.254 linkedin-pw 
+- docker run -it --rm --add-host host.docker.internal:host-gateway linkedin-pw 

@@ -101,6 +101,9 @@ def run(playwright: Playwright):
         if page.url.startswith('https://www.linkedin.com/jobs/'):
             job_positions(page)
             print(f"DONE")
+            return
+    
+    print(">>> linkedin.com/jobs/ not found")
 
 with sync_playwright() as playwright:
     run(playwright)
