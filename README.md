@@ -7,7 +7,7 @@ open -a "Google Chrome.app" --args --remote-debugging-port=9222
 
 ### check in browser if debugging avaliable
 
-http://localhost:9222/json/version/ with response
+http://localhost:9222/json/version/ with response like
 
 ```json
 {
@@ -19,3 +19,9 @@ http://localhost:9222/json/version/ with response
    "webSocketDebuggerUrl": "ws://localhost:9222/devtools/browser/5c17626d-5a62-4060-8f17-dc20ff9609de"
 }
 ```
+
+
+### build docker and run docker
+- docker build -t linkedin-pw .
+- docker build -t linkedin-pw https://github.com/username/repository.git
+- docker run -it --rm --add-host host.docker.internal:192.168.65.254 linkedin-pw 
