@@ -2,6 +2,3 @@
 .venv/
 .vscode/
 .env
-src/__pycache__/
-linked-in/
-.session.dat

@@ -7,4 +7,4 @@ COPY src/ .
 COPY requirements.txt .
 RUN pip install -r requirements.txt 
 RUN playwright install chromium
-CMD ["python", "linkedin_pw.py"]
+CMD ["python", "linkedin.py"]

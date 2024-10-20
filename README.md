@@ -2,7 +2,7 @@
 
 Mac OS
 ```
-open -a "Google Chrome.app" --args --remote-debugging-port=9222 --remote-debugging-address=0.0.0.0
+open -a "Google Chrome.app" --args --remote-debugging-port=9222
 ```
 
 ### check chrome parameters and check "Command Line:" for  --remote-debugging-port=9222
