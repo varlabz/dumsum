@@ -1,7 +1,8 @@
 name: Docker Image CI
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - '*.*.*.*'    
   pull_request:
     branches: [ "main" ]
   # Allows you to run this workflow manually from the Actions tab
@@ -21,12 +22,16 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
     - name: Make image name
-      run: echo "IMG=${{ secrets.DOCKER_HUB_ORG }}/linkedin-pw" >>$GITHUB_ENV
+      run: |
+        echo "IMG=${{ secrets.DOCKER_HUB_ORG }}/linkedin-pw" >>$GITHUB_ENV
+        echo "IMG_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
     - name: Build and tag Docker image
       run: |
         docker build -t $IMG:latest .
         docker tag $IMG:latest $IMG:${{ github.sha }}
+        docker tag $IMG:latest $IMG:$IMG_TAG
     - name: Push Docker image
       run: |
         docker push $IMG:latest
         docker push $IMG:${{ github.sha }}
+        docker push $IMG:$IMG_TAG
