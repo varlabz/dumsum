@@ -33,6 +33,7 @@ http://localhost:9222/json/version/ with response like
 ### build docker and run docker
 - docker build -t linkedin-pw .
 - docker build -t linkedin-pw https://${GIT_AUTH_TOKEN}@github.com/username/repository.git
+- docker pull testlabz/linkedin-pw
 - docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data linkedin-pw 
 
 ### how to get git auth token
