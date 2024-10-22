@@ -6,21 +6,24 @@ on:
     branches: [ "main" ]
 
 jobs:
-  - name: Checkout code
-    uses: actions/checkout@v3
-  - name: Set up Docker Buildx
-    uses: docker/setup-buildx-action@v2
-  - name: Log in to Docker Hub
-    uses: docker/login-action@v2
-    with:
-      username: ${{ secrets.DOCKER_HUB_USERNAME }}
-      password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-  - name: Build and tag Docker image
-    run: |
-      IMG=${{ secrets.DOCKER_HUB_ORG }}/linkedin-pw
-      docker build -t $IMG:latest .
-      docker tag $IMG:latest $IMG:${{ github.sha }}
-  - name: Push Docker image
-    run: |
-      docker push $IMG:latest
-      docker push $IMG:${{ github.sha }}
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    - name: Build and tag Docker image
+      run: |
+        IMG=${{ secrets.DOCKER_HUB_ORG }}/linkedin-pw
+        docker build -t $IMG:latest .
+        docker tag $IMG:latest $IMG:${{ github.sha }}
+    - name: Push Docker image
+      run: |
+        docker push $IMG:latest
+        docker push $IMG:${{ github.sha }}
