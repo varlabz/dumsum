@@ -20,9 +20,10 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    - name: Make image name
+      run: echo "IMG=${{ secrets.DOCKER_HUB_ORG }}/linkedin-pw" >>$GITHUB_ENV
     - name: Build and tag Docker image
       run: |
-        IMG=${{ secrets.DOCKER_HUB_ORG }}/linkedin-pw
         docker build -t $IMG:latest .
         docker tag $IMG:latest $IMG:${{ github.sha }}
     - name: Push Docker image
