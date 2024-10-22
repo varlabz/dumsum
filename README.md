@@ -1,4 +1,8 @@
-### works with chome browsers only 
+## prerequisites
+- docker
+- chrome browser
+
+
 
 Mac OS
 ```
@@ -10,7 +14,7 @@ open -a "Google Chrome.app" --args --remote-debugging-port=9222
 chrome://version/
 ```
 
-### check in browser if debugging avaliable
+### check in browser if debugging available
 
 http://localhost:9222/json/version/ with response like
 
@@ -29,4 +33,4 @@ http://localhost:9222/json/version/ with response like
 ### build docker and run docker
 - docker build -t linkedin-pw .
 - docker build -t linkedin-pw https://github.com/username/repository.git
-- docker run -it --rm --add-host host.docker.internal:host-gateway linkedin-pw 
+- docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data linkedin-pw 
