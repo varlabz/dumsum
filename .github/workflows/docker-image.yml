@@ -17,9 +17,10 @@ jobs:
       password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
   - name: Build and tag Docker image
     run: |
-      docker build . -t ${{ secrets.DOCKER_HUB_USERNAME }}/linkedin-pw:latest
-      docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/linkedin-pw:latest ${{ secrets.DOCKER_HUB_USERNAME }}/linkedin-pw:${{ github.sha }}
+      IMG=${{ secrets.DOCKER_HUB_ORG }}/linkedin-pw
+      docker build -t $IMG:latest .
+      docker tag $IMG:latest $IMG:${{ github.sha }}
   - name: Push Docker image
     run: |
-      docker push ${{ secrets.DOCKER_HUB_USERNAME }}/linkedin-pw:latest
-      docker push ${{ secrets.DOCKER_HUB_USERNAME }}/linkedin-pw:${{ github.sha }}
+      docker push $IMG:latest
+      docker push $IMG:${{ github.sha }}
