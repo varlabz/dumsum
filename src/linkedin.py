@@ -150,6 +150,21 @@ def easy_apply_form(page, defaults: dict, progress: int) -> bool:
 def get_job_title(page):
     return ' '.join(page.locator('a.job-card-list__title').text_content().split())
 
+def use_matcher(job: str) -> bool: 
+    from chat_groq import matcher
+    match = matcher(job) 
+    if match is None:
+        print(">>> matcher failed")
+        return False
+    print(f">>> matcher: {match}")
+    return int(match['match']) >= 50
+
+# def send_message_to_hiring_team(page):
+#     if locator_exists(page, 'div[data-feedback-redacted]'):
+#         print(">>> send message to the hiring team")
+#         msg = page.locator('div[data-feedback-redacted]')
+#         msg.locator('button[msg-form__send-btn][type="submit"]').click()
+
 def job_positions(page, defaults):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
     print(f"# positions: {len(plist)}")
@@ -161,6 +176,11 @@ def job_positions(page, defaults):
         i.click()
         page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')
+        job_description = detail.locator('article.jobs-description__container >> div.mt4').text_content().strip()
+        # print(f">>> job description: {job_description}")
+        if not use_matcher(job_description):
+            continue
+
         try:
             ea = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
         except (TimeoutError, IndexError) as ex:
@@ -183,6 +203,7 @@ def job_positions(page, defaults):
             i.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
             print(">>> don't show position again")
             print(">>> easy apply continue")
+            # send_message_to_hiring_team(page)
         else:
             print(">>> easy apply form failed")
 
