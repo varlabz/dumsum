@@ -67,12 +67,13 @@ To enable Chrome's remote debugging feature, follow these steps:
 4. **Run the Docker Container**  
    To start the Docker container, use the following command:
    ```bash
-   docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data linkedin-pw
+   docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e GROQ_API_KEY=${GROQ_API_KEY} linkedin-pw
    ```
    This command will:
    - Run the `linkedin-pw` container interactively (`-it`) and remove it when stopped (`--rm`).
    - Add a network route from the container to your host machine using `--add-host`.
    - Mount the local `./data` directory into the container at `/app/data`.
+   - Replace `GROQ_API_KEY` with key from https://console.groq.com/keys (it's free)
 
 ### Obtaining a GitHub Authentication Token
 If you don’t already have a GitHub authentication token, follow these steps:

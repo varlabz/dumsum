@@ -1,16 +1,4 @@
-from argparse import Namespace, ArgumentParser, FileType
-import argparse
-import os
-import sys
-from typing import List, Final
-from langchain_openai import OpenAI
-from langchain.globals import set_verbose
-from langchain.globals import set_debug
-import yaml
-from langchain_core.messages import HumanMessage, SystemMessage, BaseMessage
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, \
-    HumanMessagePromptTemplate
+from typing import Final
 
 HR_FILE: Final = "data/hr.md"
 SKILLS_FILE: Final = "data/skills.md"
