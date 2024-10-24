@@ -69,6 +69,8 @@ To enable Chrome's remote debugging feature, follow these steps:
    ```bash
    docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e GROQ_API_KEY=${GROQ_API_KEY} linkedin-pw
    ```
+   **ATTENTION**: *Before running Docker, copy hr.md, skills.md, and your updated resume.md into the ./data directory*
+   
    This command will:
    - Run the `linkedin-pw` container interactively (`-it`) and remove it when stopped (`--rm`).
    - Add a network route from the container to your host machine using `--add-host`.
