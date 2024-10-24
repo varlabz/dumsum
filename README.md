@@ -1,7 +1,10 @@
-## Prerequisites
+### Prerequisites
 Before proceeding, ensure that the following tools are installed and configured on your system:
 - **Docker**: You will need Docker to build and run the container.
 - **Google Chrome Browser**: This is required for running script.
+- **LinkedIn.com**: You should log in and search for positions using your criteria. *ATTENTION: The bot will only use "Easy Apply" positions.*
+
+
 
 ### Setting Up Chrome for Remote Debugging
 

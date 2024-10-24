@@ -1,17 +1,13 @@
 import argparse
 import json
 import os
-from typing import Final
-from groq import Groq
+import ollama
 
 from chat import HR_FILE, RESUME_FILE, SKILLS_FILE, extract_between_markers, read_file_content
 
-client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
-)
-
 def matcher(job: str):
-    chat_completion = client.chat.completions.create(
+    response = ollama.chat(
+        model='llama3.2', 
         messages=[
             {
                 "role": "system",
@@ -22,19 +18,18 @@ def matcher(job: str):
                 "content": read_file_content(RESUME_FILE),
             }
         ],
-        model="llama-3.2-3b-preview",
-        temperature=0,
-        max_tokens=1024*8,
-        # Controls diversity via nucleus sampling: 0.5 means half of all
-        # likelihood-weighted options are considered.
-        # top_p=1,
-        stop=None,
         stream=False,
+        options={
+            "temperature": 0, 
+            },
     )
     try:
-        res = chat_completion.choices[0].message.content
+        res = response['message']['content']
         # print(res)
-        res = extract_between_markers(res, "```json", "```")
+        tmp = extract_between_markers(res, "```json", "```")
+        res = tmp if tmp else res    
+        tmp = extract_between_markers(res, "```", "```")
+        res = tmp if tmp else res    
         ret = json.loads(res)
         return ret
     except Exception as ex:
@@ -42,7 +37,8 @@ def matcher(job: str):
         return None    
 
 def answer(skill: str):
-    chat_completion = client.chat.completions.create(
+    response = ollama.chat(
+        model='llama3.2', 
         messages=[
             {
                 "role": "system",
@@ -53,21 +49,18 @@ def answer(skill: str):
                 "content": skill,
             }
         ],
-        model="llama-3.2-3b-preview",
-        # model="llama-3.1-70b-versatile",
-        # model="llama-3.1-8b-instant",
-        temperature=0,
-        max_tokens=1024*8,
-        # Controls diversity via nucleus sampling: 0.5 means half of all
-        # likelihood-weighted options are considered.
-        # top_p=1,
-        stop=None,
         stream=False,
+        options={
+            "temperature": 0, 
+            },
     )
     try:
-        res = chat_completion.choices[0].message.content
-        # print(res)
-        res = extract_between_markers(res, "```json", "```")
+        res = response['message']['content']
+        print(res)
+        tmp = extract_between_markers(res, "```json", "```")
+        res = tmp if tmp else res    
+        tmp = extract_between_markers(res, "```", "```")
+        res = tmp if tmp else res    
         ret = json.loads(res)
         return ret
     except Exception as ex:

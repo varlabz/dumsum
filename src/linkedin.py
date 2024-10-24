@@ -1,6 +1,8 @@
 import os
 import yaml
 from playwright.sync_api import sync_playwright, Playwright
+from chat_groq import answer
+from chat_groq import matcher
 
 # def delay_call(page, callback, delay=5_000):
 #     page.wait_for_timeout(delay)
@@ -54,7 +56,7 @@ def check_required(page, dialog, defaults: dict, init):
 
     # check empty fields
     req = dialog.locator('input[required],input[aria-required="true"]').all()
-    print(f"# input required: {len(req)}")
+    # print(f"# input required: {len(req)}")
     for i in req:
         label = get_label(i)
         val = i.input_value().strip()
@@ -64,8 +66,12 @@ def check_required(page, dialog, defaults: dict, init):
             pass
         else:
             if init:
-                if defaults.get(label, None):
-                    i.fill(defaults.get(label))
+                if val:
+                    continue
+                res = answer(label)   
+                print(f">>> answer for: '{label}' is '{res}'")
+                if res and res['answer']:
+                    i.fill(str(res['answer']))
             else:
                 if not val:
                     print(f">>> required input is empty: '{label}'")
@@ -74,7 +80,7 @@ def check_required(page, dialog, defaults: dict, init):
                     defaults[label] = val
 
     req = dialog.locator('select[required],select[aria-required="true"]').all()
-    print(f"# select required: {len(req)}")
+    # print(f"# select required: {len(req)}")
     for i in req:
         label = get_label(i)
         val = i.input_value().strip()
@@ -82,8 +88,15 @@ def check_required(page, dialog, defaults: dict, init):
         selected_index = page.eval_on_selector(f'select#{i.get_attribute("id")}', "select => select.selectedIndex")
         # print(f">>> required select: '{label}'='{val}':{selected_index}///{defaults.get(label, None)}")
         if init:
-            if defaults.get(label, None):
-                i.select_option(defaults.get(label))
+            if selected_index != 0:
+                continue
+            res = answer(label)   
+            print(f">>> answer for: '{label}' is '{res}'")
+            if res and res['answer']:
+                try:
+                    i.select_option(res['answer'])
+                except Exception as ex:
+                    print(f"error: {ex}")
         else:
             if selected_index == 0:
                 page.wait_for_timeout(5_000)
@@ -138,10 +151,10 @@ def easy_apply_form(page, defaults: dict, progress: int) -> bool:
 
             if locator_exists(dialog, 'button >> span:text-is("Submit application")'):
                 print(">>> ready to submit")
-                page.wait_for_timeout(5_000)
-                optional_locator(dialog, 'button >> span:text-is("Submit application")', lambda x: x.click())
-                print(">>> submit")
-                return True
+                page.wait_for_timeout(15_000)
+                if optional_locator(dialog, 'button >> span:text-is("Submit application")', lambda x: x.click()):
+                    print(">>> submit")
+                    return True
 
         except Exception as ex:
             print(f"error: {ex}")
@@ -151,19 +164,12 @@ def get_job_title(page):
     return ' '.join(page.locator('a.job-card-list__title').text_content().split())
 
 def use_matcher(job: str) -> bool: 
-    from chat_groq import matcher
     match = matcher(job) 
     if match is None:
         print(">>> matcher failed")
         return False
     print(f">>> matcher: {match}")
     return int(match['match']) >= 50
-
-# def send_message_to_hiring_team(page):
-#     if locator_exists(page, 'div[data-feedback-redacted]'):
-#         print(">>> send message to the hiring team")
-#         msg = page.locator('div[data-feedback-redacted]')
-#         msg.locator('button[msg-form__send-btn][type="submit"]').click()
 
 def job_positions(page, defaults):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
@@ -203,7 +209,6 @@ def job_positions(page, defaults):
             i.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
             print(">>> don't show position again")
             print(">>> easy apply continue")
-            # send_message_to_hiring_team(page)
         else:
             print(">>> easy apply form failed")
 
