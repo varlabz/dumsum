@@ -67,11 +67,11 @@ To enable Chrome's remote debugging feature, follow these steps:
 4. **Run the Docker Container**  
    To start the Docker container, use the following command:
    ```bash
-   docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e GROQ_API_KEY=${GROQ_API_KEY} linkedin-pw
+   docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e GROQ_API_KEY=${GROQ_API_KEY} linkedin-pw [--matcher NUMBER]
    ```
    or
    ```bash
-   docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e OPENAI_API_KEY=${OPENAI_API_KEY} linkedin-pw
+   docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e OPENAI_API_KEY=${OPENAI_API_KEY} linkedin-pw  [--matcher NUMBER]
    ```   
    **ATTENTION**: *Before running Docker, copy hr.md, skills.md, and your updated resume.md into the local ./data directory*
    
@@ -79,8 +79,9 @@ To enable Chrome's remote debugging feature, follow these steps:
    - Run the `linkedin-pw` container interactively (`-it`) and remove it when stopped (`--rm`).
    - Add a network route from the container to your host machine using `--add-host`.
    - Mount the local `./data` directory into the container at `/app/data`.
-   - Set the `GROQ_API_KEY` environment variable with a key from https://console.groq.com/keys (free, limited usage)
-   - Set the `OPENAI_API_KEY` environment variable with a key from https://platform.openai.com/api-keys (not free, but uses an inexpensive model)
+   - Set the `GROQ_API_KEY` environment variable with a key from https://console.groq.com/keys (free, limited usage).
+   - Set the `OPENAI_API_KEY` environment variable with a key from https://platform.openai.com/api-keys (not free, but uses an inexpensive model).
+   - Use *optional* parameter `matcher` to use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.
    
 
 ### Obtaining a GitHub Authentication Token

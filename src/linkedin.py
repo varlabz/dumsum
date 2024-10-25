@@ -1,3 +1,4 @@
+import argparse
 import os
 import yaml
 from playwright.sync_api import sync_playwright, Playwright
@@ -168,13 +169,14 @@ def get_job_title(page):
     return None
 
 def use_matcher(job: str) -> bool: 
-    return True
-    # match = matcher(job) 
-    # if match is None:
-    #     print(">>> matcher failed")
-    #     return False
-    # print(f">>> matcher: {match}")
-    # return int(float(match['match'])) >= 50
+    if config().matcher:
+        match = matcher(job) 
+        print(f">>> matcher: {match}")
+        if match is None:
+            return False
+        return int(float(match['match'])) >= config().matcher
+    else:
+        return True
 
 def job_positions(page, defaults, easy_apply_form):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
@@ -246,6 +248,9 @@ def job_paginator(page, defaults, job_positions):
         job_positions(page, defaults, easy_apply_form)
 
 def run(engine: Playwright):
+    if hasattr(config(), 'help'):
+        return
+    
     chromium = engine.chromium
     browser = chromium.connect_over_cdp(os.getenv('CDP_HOST', 'http://localhost:9222'))
     for page in browser.contexts[0].pages:
@@ -261,6 +266,12 @@ def run(engine: Playwright):
             print(f"done")
             return
     print(">>> linkedin.com/jobs/ not found")
+
+def config():
+    parser = argparse.ArgumentParser(description="LinkedIn Easy Apply Bot")
+    parser.add_argument("--matcher", type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
+    args = parser.parse_args()
+    return args
 
 with sync_playwright() as playwright:
     run(playwright)
