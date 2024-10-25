@@ -73,14 +73,15 @@ To enable Chrome's remote debugging feature, follow these steps:
    ```bash
    docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e OPENAI_API_KEY=${OPENAI_API_KEY} linkedin-pw
    ```   
-   **ATTENTION**: *Before running Docker, copy hr.md, skills.md, and your updated resume.md into the ./data directory*
+   **ATTENTION**: *Before running Docker, copy hr.md, skills.md, and your updated resume.md into the local ./data directory*
    
    This command will:
    - Run the `linkedin-pw` container interactively (`-it`) and remove it when stopped (`--rm`).
    - Add a network route from the container to your host machine using `--add-host`.
    - Mount the local `./data` directory into the container at `/app/data`.
-   - Replace `GROQ_API_KEY` with key from https://console.groq.com/keys (it's free)
-   - Replace `OPENAI_API_KEY` with key from https://platform.openai.com/api-keys (not free, but it uses very cheap model)
+   - Set the `GROQ_API_KEY` environment variable with a key from https://console.groq.com/keys (free, limited usage)
+   - Set the `OPENAI_API_KEY` environment variable with a key from https://platform.openai.com/api-keys (not free, but uses an inexpensive model)
+   
 
 ### Obtaining a GitHub Authentication Token
 If you don’t already have a GitHub authentication token, follow these steps:
@@ -92,3 +93,12 @@ If you don’t already have a GitHub authentication token, follow these steps:
 
 For more details, check out this GitHub [discussion](https://github.com/orgs/community/discussions/74701) on generating access tokens.
 
+### Usage 
+
+1. **Log In**: Access your LinkedIn account and log in.
+2. **Go to the Search Page**: Navigate to the job search page.
+3. **Set Filters and Criteria**: In the search fields, enter the filters and criteria (e.g., job title, location, experience level) to find relevant job listings.
+4. **Start the Search**: Click the search button to view results based on your specifications.
+5. **Run the Bot**: Once the results load, activate the bot to automatically use the "Easy Apply" feature on listings that match your search criteria.
+
+Follow these steps to simplify and speed up your job application process!
