@@ -87,8 +87,10 @@ def main_chat():
     parser.add_argument("-j", required=False, type=str, help="Job description file")
     parser.add_argument("-s", required=False, type=str, help="skill")
     args = parser.parse_args()
-    # return matcher(read_file_content(args.j))
-    return answer(args.s)
+    if hasattr(args, 'j') and args.j:
+        return matcher(read_file_content(args.j))
+    if hasattr(args, 's') and args.s:
+        return answer(args.s)
 
 if __name__ == "__main__":
     print(main_chat())

@@ -1,30 +1,29 @@
 import argparse
 import json
 import os
-import ollama
+import anthropic
 
 from chat_common import HR_FILE, RESUME_FILE, SKILLS_FILE, extract_between_markers, read_file_content
 
+client = anthropic.Anthropic(
+    api_key=os.environ.get("ANTHROPIC_API_KEY"),
+)
+
 def matcher(job: str):
-    response = ollama.chat(
-        model='llama3.2', 
+    message = client.messages.create(
+        model="claude-3-haiku-20240307",
+        temperature=0.8,
+        max_tokens=1024*4,
+        system=read_file_content(HR_FILE).format(JOB_DESCRIPTION=job,),
         messages=[
-            {
-                "role": "system",
-                "content": read_file_content(HR_FILE).format(JOB_DESCRIPTION=job,)
-            },
             {
                 "role": "user",
                 "content": read_file_content(RESUME_FILE),
-            }
-        ],
-        stream=False,
-        options={
-            "temperature": 0, 
             },
+        ],
     )
     try:
-        res = response['message']['content']
+        res = message.content[0].text
         # print(res)
         tmp = extract_between_markers(res, "```json", "```")
         res = tmp if tmp else res    
@@ -37,26 +36,21 @@ def matcher(job: str):
         return None    
 
 def answer(skill: str):
-    response = ollama.chat(
-        model='llama3.2', 
+    message = client.messages.create(
+        model="claude-3-haiku-20240307",
+        temperature=0,
+        max_tokens=1024*2,
+        system=read_file_content(SKILLS_FILE).format(RESUME=read_file_content(RESUME_FILE),),
         messages=[
-            {
-                "role": "system",
-                "content": read_file_content(SKILLS_FILE).format(RESUME=read_file_content(RESUME_FILE),)
-            },
             {
                 "role": "user",
                 "content": skill,
             }
         ],
-        stream=False,
-        options={
-            "temperature": 0, 
-            },
     )
     try:
-        res = response['message']['content']
-        print(res)
+        res = message.content[0].text
+        # print(res)
         tmp = extract_between_markers(res, "```json", "```")
         res = tmp if tmp else res    
         tmp = extract_between_markers(res, "```", "```")

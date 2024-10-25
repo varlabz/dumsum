@@ -1,10 +1,9 @@
 ### Prerequisites
+
 Before proceeding, ensure that the following tools are installed and configured on your system:
 - **Docker**: You will need Docker to build and run the container.
 - **Google Chrome Browser**: This is required for running script.
 - **LinkedIn.com**: You should log in and search for positions using your criteria. *ATTENTION: The bot will only use "Easy Apply" positions.*
-
-
 
 ### Setting Up Chrome for Remote Debugging
 
@@ -80,11 +79,11 @@ To enable Chrome's remote debugging feature, follow these steps:
    - Add a network route from the container to your host machine using `--add-host`.
    - Mount the local `./data` directory into the container at `/app/data`.
    - Set the `GROQ_API_KEY` environment variable with a key from https://console.groq.com/keys (free, limited usage).
-   - Set the `OPENAI_API_KEY` environment variable with a key from https://platform.openai.com/api-keys (not free, but uses an inexpensive model).
+   - Set the `OPENAI_API_KEY` environment variable with a key from https://platform.openai.com/api-keys (not free, uses an inexpensive model).
    - Use *optional* parameter `matcher` to use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.
    
-
 ### Obtaining a GitHub Authentication Token
+
 If you don’t already have a GitHub authentication token, follow these steps:
 
 1. Visit GitHub's [Personal Access Tokens](https://github.com/settings/tokens) page.

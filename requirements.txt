@@ -3,3 +3,4 @@ PyYAML
 groq
 openai
 ollama
+anthropic
