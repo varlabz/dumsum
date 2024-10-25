@@ -4,7 +4,7 @@ import os
 from typing import Final
 from groq import Groq
 
-from chat import HR_FILE, RESUME_FILE, SKILLS_FILE, extract_between_markers, read_file_content
+from chat_common import HR_FILE, RESUME_FILE, SKILLS_FILE, extract_between_markers, read_file_content
 
 client = Groq(
     api_key=os.environ.get("GROQ_API_KEY"),
@@ -23,6 +23,7 @@ def matcher(job: str):
             }
         ],
         model="llama-3.2-3b-preview",
+        # model="llama-3.1-70b-versatile",
         temperature=0,
         max_tokens=1024*8,
         # Controls diversity via nucleus sampling: 0.5 means half of all
@@ -34,7 +35,10 @@ def matcher(job: str):
     try:
         res = chat_completion.choices[0].message.content
         # print(res)
-        res = extract_between_markers(res, "```json", "```")
+        tmp = extract_between_markers(res, "```json", "```")
+        res = tmp if tmp else res    
+        tmp = extract_between_markers(res, "```", "```")
+        res = tmp if tmp else res    
         ret = json.loads(res)
         return ret
     except Exception as ex:
@@ -67,7 +71,10 @@ def answer(skill: str):
     try:
         res = chat_completion.choices[0].message.content
         # print(res)
-        res = extract_between_markers(res, "```json", "```")
+        tmp = extract_between_markers(res, "```json", "```")
+        res = tmp if tmp else res    
+        tmp = extract_between_markers(res, "```", "```")
+        res = tmp if tmp else res    
         ret = json.loads(res)
         return ret
     except Exception as ex:

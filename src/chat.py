@@ -1,20 +1,30 @@
+import os
 from typing import Final
 
-HR_FILE: Final = "data/hr.md"
-SKILLS_FILE: Final = "data/skills.md"
-RESUME_FILE: Final = "data/resume.md"
+use_openai: Final = True if os.environ.get("OPENAI_API_KEY") else False
+use_groq: Final = True if os.environ.get("GROQ_API_KEY") else False
+if not use_openai and not use_groq:
+    print("Using Ollama")
 
-def read_file_content(file_path) -> str | None:
-    with open(file_path, 'r') as file:
-        return file.read()
+def answer(skill: str):
+    if use_openai:
+        import chat_openai
+        return chat_openai.answer(skill)
+    elif use_groq:
+        import chat_groq
+        return chat_groq.answer(skill)
+    else: 
+        import chat_ollama
+        return chat_ollama.answer(skill)
+      
 
-def extract_between_markers(text, marker1, marker2):
-    start = text.find(marker1)
-    if start == -1:
-        return None
-    start += len(marker1)
-    end = text.find(marker2, start)
-    if end == -1:
-        return None
-    return text[start:end]
-
+def matcher(job: str):
+    if use_openai:
+        import chat_openai
+        return chat_openai.matcher(job)
+    elif use_groq:
+        import chat_groq
+        return chat_groq.matcher(job)
+    else: 
+        import chat_ollama
+        return chat_ollama.matcher(job)

@@ -1,13 +1,17 @@
 import argparse
 import json
 import os
-import ollama
+from typing import Final
+from openai import OpenAI
 
 from chat_common import HR_FILE, RESUME_FILE, SKILLS_FILE, extract_between_markers, read_file_content
 
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
+
 def matcher(job: str):
-    response = ollama.chat(
-        model='llama3.2', 
+    chat_completion = client.chat.completions.create(
         messages=[
             {
                 "role": "system",
@@ -18,13 +22,13 @@ def matcher(job: str):
                 "content": read_file_content(RESUME_FILE),
             }
         ],
+        model="gpt-4o-mini",
+        temperature=0.5,
+        stop=None,
         stream=False,
-        options={
-            "temperature": 0, 
-            },
     )
     try:
-        res = response['message']['content']
+        res = chat_completion.choices[0].message.content
         # print(res)
         tmp = extract_between_markers(res, "```json", "```")
         res = tmp if tmp else res    
@@ -37,8 +41,7 @@ def matcher(job: str):
         return None    
 
 def answer(skill: str):
-    response = ollama.chat(
-        model='llama3.2', 
+    chat_completion = client.chat.completions.create(
         messages=[
             {
                 "role": "system",
@@ -49,14 +52,15 @@ def answer(skill: str):
                 "content": skill,
             }
         ],
+        model="gpt-4o-mini",
+        temperature=0.5,
+        max_tokens=1024*8,
+        stop=None,
         stream=False,
-        options={
-            "temperature": 0, 
-            },
     )
     try:
-        res = response['message']['content']
-        print(res)
+        res = chat_completion.choices[0].message.content
+        # print(res)
         tmp = extract_between_markers(res, "```json", "```")
         res = tmp if tmp else res    
         tmp = extract_between_markers(res, "```", "```")

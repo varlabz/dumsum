@@ -1,3 +1,5 @@
 playwright
 PyYAML
 groq
+openai
+ollama

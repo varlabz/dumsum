@@ -1,8 +1,8 @@
 import os
 import yaml
 from playwright.sync_api import sync_playwright, Playwright
-from chat_groq import answer
-from chat_groq import matcher
+from chat import answer
+from chat import matcher
 
 # def delay_call(page, callback, delay=5_000):
 #     page.wait_for_timeout(delay)
@@ -70,7 +70,7 @@ def check_required(page, dialog, defaults: dict, init):
                     continue
                 res = answer(label)   
                 print(f">>> answer for: '{label}' is '{res}'")
-                if res and res['answer']:
+                if res: # answer can be 0, accept it
                     i.fill(str(res['answer']))
             else:
                 if not val:
@@ -161,17 +161,22 @@ def easy_apply_form(page, defaults: dict, progress: int) -> bool:
             return False
 
 def get_job_title(page):
-    return ' '.join(page.locator('a.job-card-list__title').text_content().split())
+    if locator_exists(page, 'a.job-card-list__title'):
+        return ' '.join(page.locator('a.job-card-list__title').text_content().split())
+    if locator_exists(page, 'a.job-card-job-posting-card-wrapper__card-link'):
+        return ' '.join(page.locator('a.job-card-job-posting-card-wrapper__card-link').text_content().split())
+    return None
 
 def use_matcher(job: str) -> bool: 
-    match = matcher(job) 
-    if match is None:
-        print(">>> matcher failed")
-        return False
-    print(f">>> matcher: {match}")
-    return int(match['match']) >= 50
+    return True
+    # match = matcher(job) 
+    # if match is None:
+    #     print(">>> matcher failed")
+    #     return False
+    # print(f">>> matcher: {match}")
+    # return int(float(match['match'])) >= 50
 
-def job_positions(page, defaults):
+def job_positions(page, defaults, easy_apply_form):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
     print(f"# positions: {len(plist)}")
     for i in plist:
@@ -186,7 +191,6 @@ def job_positions(page, defaults):
         # print(f">>> job description: {job_description}")
         if not use_matcher(job_description):
             continue
-
         try:
             ea = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
         except (TimeoutError, IndexError) as ex:
@@ -211,8 +215,35 @@ def job_positions(page, defaults):
             print(">>> easy apply continue")
         else:
             print(">>> easy apply form failed")
-
         print(">>> next position")
+
+def job_paginator(page, defaults, job_positions):
+    page.wait_for_timeout(1_000)
+    if locator_exists(page, 'div.jobs-search-results-list__pagination'):
+        pages = page.locator('div.jobs-search-results-list__pagination >> li[data-test-pagination-page-btn]').all()
+        # print(f"# pages: {len(pages)}")
+        have_current = -1
+        new_pages = []
+        for p in pages:     # copy the rest links from current selection 
+            curr = int(p.get_attribute('data-test-pagination-page-btn'))
+            # print(f">>> page: {curr}")
+            if p.locator('button[aria-current="true"]').count() > 0:
+                have_current = int(curr)
+                new_pages.append(p)
+            if have_current == -1:
+                continue    
+            if curr == (have_current + 1):
+                new_pages.append(p)
+            have_current = int(curr)
+        # print(f"# new pages: {len(new_pages)}")    
+        for p in new_pages:
+            curr = int(p.get_attribute('data-test-pagination-page-btn'))
+            # print(f">>> new page: {curr}")
+            p.click()
+            page.wait_for_timeout(1_000)
+            job_positions(page, defaults, easy_apply_form)
+    else:
+        job_positions(page, defaults, easy_apply_form)
 
 def run(engine: Playwright):
     chromium = engine.chromium
@@ -225,11 +256,10 @@ def run(engine: Playwright):
                 save_defaults(defaults)
             with open(DEFAULTS, "r") as file:
                 defaults = yaml.safe_load(file)
-            job_positions(page, defaults)
+            job_paginator(page, defaults, job_positions)
             save_defaults(defaults)
             print(f"done")
             return
-    
     print(">>> linkedin.com/jobs/ not found")
 
 with sync_playwright() as playwright:

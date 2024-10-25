@@ -40,12 +40,6 @@ Example output structure:
 # THOUGHT PROCESS
 [Your detailed thought process as described above]
 
-# COMPARISON
-[Detailed comparison for each area]
-
-# RECOMMENDATION
-[Your recommendation and brief explanation]
-
 Example JSON output
 ```json
 {{
