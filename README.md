@@ -1,11 +1,11 @@
-### Prerequisites
+## Prerequisites
 
 Before proceeding, ensure that the following tools are installed and configured on your system:
 - **Docker**: You will need Docker to build and run the container.
 - **Google Chrome Browser**: This is required for running script.
 - **LinkedIn.com**: You should log in and search for positions using your criteria. *ATTENTION: The bot will only use "Easy Apply" positions.*
 
-### Setting Up Chrome for Remote Debugging
+## Setting Up Chrome for Remote Debugging
 
 To enable Chrome's remote debugging feature, follow these steps:
 
@@ -41,30 +41,36 @@ To enable Chrome's remote debugging feature, follow these steps:
    ```
    This response confirms that the remote debugging service is active and ready for connections.
 
-### Building and Running the Docker Container
+## Building the Docker Container (use 1 of them)
 
-1. **Build the Docker Image Locally**  
+**Build the Docker Image Locally**  
    You can build the Docker image from a local Dockerfile by using the following command:
    ```bash
    docker build -t linkedin-pw .
    ```
    This will create an image tagged as `linkedin-pw`.
 
-2. **Build the Docker Image from a Git Repository**  
+or
+
+**Build the Docker Image from a Git Repository**  
    If your Dockerfile is hosted in a Git repository, you can build the image directly from the repository. Ensure that you have your GitHub authentication token, then use this command:
    ```bash
    docker build -t linkedin-pw https://${GIT_AUTH_TOKEN}@github.com/var-lab/dumsum.git
    ```
    Replace `GIT_AUTH_TOKEN` with your actual GitHub authentication token.
 
-3. 3. **Pull Pre-built Docker Image (recommended)**
+or
+
+**Pull Pre-built Docker Image (recommended)**
  
    Alternatively, you can pull the image directly using:
    ```bash
    docker pull testlabz/linkedin-pw
    ```
 
-4. **Run the Docker Container**  
+## Running the Docker Container
+
+
    To start the Docker container, use the following command:
    ```bash
    docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e GROQ_API_KEY=${GROQ_API_KEY} linkedin-pw [--matcher NUMBER]
@@ -89,7 +95,7 @@ To enable Chrome's remote debugging feature, follow these steps:
    - Set the `ANTHROPIC_API_KEY` environment variable with a key from https://console.anthropic.com/settings/keys (not free, uses an inexpensive model).
    - Use *optional* parameter `matcher` to use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.
    
-### Obtaining a GitHub Authentication Token
+## Obtaining a GitHub Authentication Token
 
 If you don’t already have a GitHub authentication token, follow these steps:
 
@@ -100,7 +106,7 @@ If you don’t already have a GitHub authentication token, follow these steps:
 
 For more details, check out this GitHub [discussion](https://github.com/orgs/community/discussions/74701) on generating access tokens.
 
-### Usage 
+## Usage 
 
 1. **Log In**: Access your LinkedIn account and log in.
 2. **Go to the Search Page**: Navigate to the job search page.
