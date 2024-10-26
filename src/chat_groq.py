@@ -4,7 +4,7 @@ import os
 from typing import Final
 from groq import Groq
 
-from chat_common import HR_FILE, RESUME_FILE, SKILLS_FILE, extract_between_markers, read_file_content
+from chat_common import DEFAULTS_FILE, HR_FILE, RESUME_FILE, SKILLS_FILE, extract_between_markers, read_file_content
 
 client = Groq(
     api_key=os.environ.get("GROQ_API_KEY"),
@@ -54,7 +54,7 @@ def answer(skill: str):
             },
             {
                 "role": "user",
-                "content": skill,
+                "content": skill + "\n" + read_file_content(DEFAULTS_FILE),
             }
         ],
         model="llama-3.2-3b-preview",
@@ -93,4 +93,4 @@ def main_chat():
         return answer(args.s)
 
 if __name__ == "__main__":
-    print(main_chat())
+    print(f">>> {main_chat()}")

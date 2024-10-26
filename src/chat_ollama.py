@@ -56,7 +56,7 @@ def answer(skill: str):
     )
     try:
         res = response['message']['content']
-        print(res)
+        # print(res)
         tmp = extract_between_markers(res, "```json", "```")
         res = tmp if tmp else res    
         tmp = extract_between_markers(res, "```", "```")

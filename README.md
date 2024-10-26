@@ -57,7 +57,8 @@ To enable Chrome's remote debugging feature, follow these steps:
    ```
    Replace `GIT_AUTH_TOKEN` with your actual GitHub authentication token.
 
-3. **Pull Pre-built Docker Image**  
+3. 3. **Pull Pre-built Docker Image (recommended)**
+ 
    Alternatively, you can pull the image directly using:
    ```bash
    docker pull testlabz/linkedin-pw
@@ -72,6 +73,11 @@ To enable Chrome's remote debugging feature, follow these steps:
    ```bash
    docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e OPENAI_API_KEY=${OPENAI_API_KEY} linkedin-pw  [--matcher NUMBER]
    ```   
+   or
+   ```bash
+   docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY} linkedin-pw  [--matcher NUMBER]
+   ```   
+
    **ATTENTION**: *Before running Docker, copy hr.md, skills.md, and your updated resume.md into the local ./data directory*
    
    This command will:
@@ -80,6 +86,7 @@ To enable Chrome's remote debugging feature, follow these steps:
    - Mount the local `./data` directory into the container at `/app/data`.
    - Set the `GROQ_API_KEY` environment variable with a key from https://console.groq.com/keys (free, limited usage).
    - Set the `OPENAI_API_KEY` environment variable with a key from https://platform.openai.com/api-keys (not free, uses an inexpensive model).
+   - Set the `ANTHROPIC_API_KEY` environment variable with a key from https://console.anthropic.com/settings/keys (not free, uses an inexpensive model).
    - Use *optional* parameter `matcher` to use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.
    
 ### Obtaining a GitHub Authentication Token

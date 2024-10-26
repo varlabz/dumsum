@@ -4,6 +4,7 @@ from typing import Final
 HR_FILE: Final = "data/hr.md"
 SKILLS_FILE: Final = "data/skills.md"
 RESUME_FILE: Final = "data/resume.md"
+DEFAULTS_FILE: Final = "data/defaults.yaml"
 
 def read_file_content(file_path: str) -> str | None:
     with open(file_path, 'r') as file:

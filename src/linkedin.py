@@ -4,44 +4,7 @@ import yaml
 from playwright.sync_api import sync_playwright, Playwright
 from chat import answer
 from chat import matcher
-
-# def delay_call(page, callback, delay=5_000):
-#     page.wait_for_timeout(delay)
-#     callback()
-
-def locator_exists(page, selector):
-    return page.locator(selector).count() > 0
-
-def optional_locator(page, field, callback):
-    try:
-        if not locator_exists(page, field):
-            return None
-        e = page.locator(field)
-        # print(f"### optional_locator: {e} for {field}")
-        if e is None:
-            return None     
-        callback(e)
-        return e 
-    except Exception as ex:
-        print(f"error: {ex}")
-    return None
-
-# hack. sometimes selector has 2 spans with the same text. use 1 only
-def remove2(text: str):
-    mid = len(text) // 2
-    half1 = text[:mid]
-    half2 = text[mid:]
-    if  half1 == half2:
-        return half1
-    else:
-        return text
-
-def get_label(el, ):
-    if el.locator('..').locator('label').count() > 0:
-        el = el.locator('..').locator('label')
-    elif el.locator('..').locator('..').locator('label').count() > 0: # sometimes need to check 1 level up
-        el = el.locator('..').locator('..').locator('label')
-    return remove2(' '.join(el.text_content().split()))
+from common import *
 
 def check_required(page, dialog, defaults: dict, init):
     def check_radio(el):
@@ -108,7 +71,7 @@ DEFAULTS = "data/defaults.yaml"
 
 def save_defaults(defaults: dict):
     with open(DEFAULTS, "w") as file:
-        yaml.dump(defaults, file, default_flow_style=False, sort_keys=False)
+        yaml.dump(defaults, file, width=float('inf'), default_flow_style=False, sort_keys=False)
 
 def easy_apply_form(page, defaults: dict, progress: int) -> bool:
     # progress: -1 very first start, 0 - 1st page, 100 - last page
@@ -147,12 +110,11 @@ def easy_apply_form(page, defaults: dict, progress: int) -> bool:
                 check = optional_locator(dialog, 'input[id="follow-company-checkbox"]', lambda x: x)
                 if check and check.is_checked():
                     label.click()
-
             optional_locator(dialog, 'label[for="follow-company-checkbox"]', lambda x: follow_check(x))
 
             if locator_exists(dialog, 'button >> span:text-is("Submit application")'):
                 print(">>> ready to submit")
-                page.wait_for_timeout(15_000)
+                page.wait_for_timeout(30_000)
                 if optional_locator(dialog, 'button >> span:text-is("Submit application")', lambda x: x.click()):
                     print(">>> submit")
                     return True

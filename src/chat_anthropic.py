@@ -12,6 +12,7 @@ client = anthropic.Anthropic(
 def matcher(job: str):
     message = client.messages.create(
         model="claude-3-haiku-20240307",
+        # model="claude-3-5-sonnet-latest",
         temperature=0.8,
         max_tokens=1024*4,
         system=read_file_content(HR_FILE).format(JOB_DESCRIPTION=job,),
@@ -50,7 +51,7 @@ def answer(skill: str):
     )
     try:
         res = message.content[0].text
-        # print(res)
+        print(res)
         tmp = extract_between_markers(res, "```json", "```")
         res = tmp if tmp else res    
         tmp = extract_between_markers(res, "```", "```")
@@ -73,4 +74,4 @@ def main_chat():
         return answer(args.s)
 
 if __name__ == "__main__":
-    print(main_chat())
+    print(f">>>> {main_chat()}")

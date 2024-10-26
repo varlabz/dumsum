@@ -83,4 +83,4 @@ def main_chat():
         return answer(args.s)
 
 if __name__ == "__main__":
-    print(main_chat())
+    print(f">>> {main_chat()}")

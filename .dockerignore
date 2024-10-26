@@ -1,0 +1,23 @@
+.git
+*.log
+*.tmp
+*.swp
+.DS_Store
+node_modules
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+README.md
+docs
+test
+tests
+Dockerfile
+.dockerignore
+.gitlab-ci.yml
+.travis.yml
+.env
+*.env
+# project specific
+data
+.*
