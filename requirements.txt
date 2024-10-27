@@ -1,6 +1,6 @@
 playwright
 PyYAML
-groq
-openai
-ollama
-anthropic
+langchain-anthropic
+langchain-groq
+langchain-openai
+langchain-ollama

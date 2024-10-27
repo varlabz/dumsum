@@ -31,5 +31,4 @@ Remember:
 - Be concise and direct in your answer.
 - Explanation must be short as possible
 
-
 # INPUT
