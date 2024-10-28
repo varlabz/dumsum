@@ -1,45 +1,78 @@
 import yaml
 from chat import answer
 from common import *
+from defaults import Defaults
 
-
-def check_required(page, dialog, defaults: dict, init):
-    def check_radio(el):
-        v = el.get_attribute("value")
-        if init:
-            if defaults.get(v, False):
-                i.check()
+def fieldset_radio(dialog, defaults: Defaults, init):
+    req = dialog.locator('fieldset:has(input[type="radio"][aria-required="true"])').all()
+    # print(f"# fieldset: {req}")
+    for r in req:
+        if l := locator_exists(r, 'legend >> span[aria-hidden="true"]'):
+            label = l.text_content().strip()
         else:
-            if i.is_checked():
-                defaults[v] = True
-            else:
-                defaults.pop(v, False)
+            print(f"error: no label for fieldset: {r}")
+            continue            
+        inputs = r.locator('input[type="radio"][aria-required="true"]').all()
+        if init:
+            if any((j:=i).is_checked() for i in inputs):
+                defaults[label] = j.get_attribute('data-test-text-selectable-option__input')
+                continue
+            if v := defaults[label]:
+                print(f">>> answer for: '{label}' is '{v}'")
+                print(f"### options: {[i.get_attribute('data-test-text-selectable-option__input') for i in inputs]}")
+                if any(((k:=j).get_attribute('data-test-text-selectable-option__input').lower()) == (a:=v['answer'].lower()) for j in inputs):
+                    k.locator('..').locator('label').click()    # direct click on radio doesn't work
+        else:
+            if any((j:=i).is_checked() for i in inputs):
+                defaults[label] = j.get_attribute('data-test-text-selectable-option__input')
+                continue
 
+def textarea(dialog, defaults: Defaults, init):
+    req = dialog.locator('textarea[required]').all()
+    # print(f"# textarea: {len(req)}")
+    for r in req:
+        label = r.get_attribute['aria-label'].strip()
+        print(label)
+        val = r.input_value().strip()
+        print(f">>> textarea: '{label}'='{val}'///{defaults[label]}")
+        if init:
+            if val:
+                continue
+            if v := defaults.get(label):
+                print(f">>> answer for: '{label}' is '{v}'")
+                r.fill(v['answer'])
+                continue
+        else:
+            if not val:
+                print(f">>> textarea is empty: '{label}'")
+            else:
+                defaults[label] = val
+
+def check_required(page, dialog, defaults: Defaults, init):
+    fieldset_radio(dialog, defaults, init)
+    textarea(dialog, defaults, init)
     # check empty fields
     req = dialog.locator('input[required],input[aria-required="true"]').all()
     # print(f"# input required: {len(req)}")
     for i in req:
         label = get_label(i)
         val = i.input_value().strip()
-        # print(f">>> required input: '{label}'='{val}' /// {defaults.get(label, None)}")
+        # print(f">>> required input: '{label}'='{val}' /// {defaults[label]}")
         if i.get_attribute('type') == "radio":  # special case for radio buttons
-            #check_radio(i) # TODO do it right way. use label and radio buttons as values
+            # check_radio(i) # TODO do it right way. use label and radio buttons as values
             pass
         else:
             if init:
                 if val:
                     continue
-                if defaults.get(label, None):
-                    i.fill(str(defaults[label]))
+                if v := defaults.get(label):
+                    print(f">>> answer for: '{label}' is '{v}'")
+                    i.fill(v['answer'])
                     continue              
-                res = answer(label)   
-                print(f">>> answer for: '{label}' is '{res}'")
-                if res: # answer can be 0, accept it
-                    i.fill(str(res['answer']))
             else:
                 if not val:
                     print(f">>> required input is empty: '{label}'")
-                    page.wait_for_timeout(5_000)
+                    page.wait_for_timeout(10_000)
                 else:
                     defaults[label] = val
 
@@ -50,33 +83,21 @@ def check_required(page, dialog, defaults: dict, init):
         val = i.input_value().strip()
         # hack: get a selected index from selector
         selected_index = page.eval_on_selector(f'select#{i.get_attribute("id")}', "select => select.selectedIndex")
-        # print(f">>> required select: '{label}'='{val}':{selected_index}///{defaults.get(label, None)}")
+        # print(f">>> required select: '{label}'='{val}':{selected_index}///{defaults[label]}")
         if init:
             if selected_index != 0:
                 continue
-            if defaults.get(label, None):
-                i.select_option(defaults[label])
+            if v := defaults.get(label):
+                print(f">>> answer for: '{label}' is '{v}'")
+                i.select_option(v['answer'])
                 continue
-            res = answer(label)   
-            print(f">>> answer for: '{label}' is '{res}'")
-            if res and res['answer']:
-                try:
-                    i.select_option(res['answer'])
-                except Exception as ex:
-                    print(f"error: {ex}")
         else:
             if selected_index == 0:
-                page.wait_for_timeout(5_000)
+                page.wait_for_timeout(10_000)
             else:
                 defaults[label] = val
 
-DEFAULTS = "data/defaults.yaml"
-
-def save_defaults(defaults: dict):
-    with open(DEFAULTS, "w") as file:
-        yaml.dump(defaults, file, width=float('inf'), default_flow_style=False, sort_keys=False)
-
-def easy_apply_form(page, defaults: dict, progress: int) -> bool:
+def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     # progress: -1 very first start, 0 - 1st page, 100 - last page
     # click easy apply button
     print(">>> start easy apply form")
@@ -95,7 +116,7 @@ def easy_apply_form(page, defaults: dict, progress: int) -> bool:
                 init = False
 
             check_required(page, dialog, defaults, init)
-            save_defaults(defaults)
+            defaults.save()
 
             if optional_locator(dialog, 'button >> span:text-is("Skip")', lambda x: x.click()):
                 print(">>> skip")

@@ -6,10 +6,11 @@ from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, \
     HumanMessagePromptTemplate
 
-HR_FILE: Final = "data/hr.md"
-SKILLS_FILE: Final = "data/skills.md"
-RESUME_FILE: Final = "data/resume.md"
-DEFAULTS_FILE: Final = "data/defaults.yaml"
+from common import get_data_file
+
+HR_FILE: Final = "hr.md"
+SKILLS_FILE: Final = "skills.md"
+RESUME_FILE: Final = "data/resume.md"       # should use user updated resume file
 
 def read_file_content(file_path: str) -> str | None:
     with open(file_path, 'r') as file:
@@ -62,11 +63,10 @@ def _chat():
         temperature=0,
     )
 
-chat = _chat()
-
 def matcher(job: str):
-    system = SystemMessagePromptTemplate.from_template(read_file_content(HR_FILE)).format(JOB_DESCRIPTION=job,)    
-    user = HumanMessagePromptTemplate.from_template(read_file_content(RESUME_FILE)).format()                                                       
+    chat = _chat()
+    system = SystemMessagePromptTemplate.from_template_file(get_data_file(HR_FILE), ['JOB_DESCRIPTION']).format(JOB_DESCRIPTION=job,)    
+    user = HumanMessagePromptTemplate.from_template_file(RESUME_FILE, []).format()                                                       
     prompt_template = ChatPromptTemplate.from_messages([system, user])
     try:
         chain = prompt_template | chat | JsonOutputParser() 
@@ -78,9 +78,8 @@ def matcher(job: str):
         return None    
 
 def answer(skill: str):
-    # TODO: problem with ollama and big default 
-    # system = SystemMessagePromptTemplate.from_template(read_file_content(SKILLS_FILE)).format(RESUME=read_file_content(RESUME_FILE) + "\n" + read_file_content(DEFAULTS_FILE),)
-    system = SystemMessagePromptTemplate.from_template(read_file_content(SKILLS_FILE)).format(RESUME=read_file_content(RESUME_FILE),)
+    chat = _chat()
+    system = SystemMessagePromptTemplate.from_template_file(get_data_file(SKILLS_FILE), ['RESUME']).format(RESUME=read_file_content(RESUME_FILE),)
     user = HumanMessagePromptTemplate.from_template(skill).format()                                                       
     prompt_template = ChatPromptTemplate.from_messages([system, user])
     try:
@@ -93,15 +92,15 @@ def answer(skill: str):
         return None    
 
 # testing
-def _main_chat():
-    parser = argparse.ArgumentParser(description="Chat with AI")
-    parser.add_argument("-j", required=False, type=str, help="Job description file")
-    parser.add_argument("-s", required=False, type=str, help="skill")
-    args = parser.parse_args()
-    if hasattr(args, 'j') and args.j:
-        return matcher(read_file_content(args.j))
-    if hasattr(args, 's') and args.s:
-        return answer(args.s)
-
 if __name__ == "__main__":
+    def _main_chat():
+        parser = argparse.ArgumentParser(description="Chat with AI")
+        parser.add_argument("-j", required=False, type=str, help="Job description file")
+        parser.add_argument("-s", required=False, type=str, help="skill")
+        args = parser.parse_args()
+        if hasattr(args, 'j') and args.j:
+            return matcher(read_file_content(args.j))
+        if hasattr(args, 's') and args.s:
+            return answer(args.s)
+    
     print(f"{_main_chat()}")

@@ -4,6 +4,8 @@ FROM python:3.12-slim
 ENV CDP_HOST='http://192.168.65.254:9222'
 WORKDIR /app
 COPY src/*.py ./src/
+# check code how to ignore resume.md 
+COPY data/*.md .            
 COPY requirements.txt .
 RUN pip install -r requirements.txt 
 RUN playwright install chromium

@@ -84,7 +84,7 @@ or
    docker run -it --rm --add-host host.docker.internal:host-gateway -v ./data:/app/data -e ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY} linkedin-pw  [--matcher NUMBER]
    ```   
 
-   **ATTENTION**: *Before running Docker, copy hr.md, skills.md, and your updated resume.md into the local ./data directory*
+   **ATTENTION**: *Before running Docker, copy your updated resume.md into the local ./data directory*
    
    This command will:
    - Run the `linkedin-pw` container interactively (`-it`) and remove it when stopped (`--rm`).
@@ -93,7 +93,8 @@ or
    - Set the `GROQ_API_KEY` environment variable with a key from https://console.groq.com/keys (free, limited usage).
    - Set the `OPENAI_API_KEY` environment variable with a key from https://platform.openai.com/api-keys (not free, uses an inexpensive model).
    - Set the `ANTHROPIC_API_KEY` environment variable with a key from https://console.anthropic.com/settings/keys (not free, uses an inexpensive model).
-   - Use *optional* parameter `matcher` to use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.
+   - Use *optional* parameter `matcher` to use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold. By default, the script retrieves all positions from the search results.
+
    
 ## Obtaining a GitHub Authentication Token
 

@@ -5,13 +5,14 @@ from playwright.sync_api import sync_playwright, Playwright
 from chat import answer
 from chat import matcher
 from common import *
-from linkedin_easy_apply import DEFAULTS, easy_apply_form, save_defaults
+from defaults import Defaults
+from linkedin_easy_apply import easy_apply_form
 
 def get_job_title(page):
-    if locator_exists(page, 'a.job-card-list__title'):
-        return ' '.join(page.locator('a.job-card-list__title').text_content().split())
-    if locator_exists(page, 'a.job-card-job-posting-card-wrapper__card-link'):
-        return ' '.join(page.locator('a.job-card-job-posting-card-wrapper__card-link').text_content().split())
+    if l := locator_exists(page, 'a.job-card-list__title'):
+        return ' '.join(l.text_content().split())
+    if l := locator_exists(page, 'a.job-card-job-posting-card-wrapper__card-link'):
+        return ' '.join(l.text_content().split())
     return None
 
 def use_matcher(job: str) -> bool: 
@@ -24,7 +25,7 @@ def use_matcher(job: str) -> bool:
     else:
         return True
 
-def job_positions(page, defaults, easy_apply_form):
+def job_positions(page, defaults: Defaults, easy_apply_form):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
     print(f"# positions: {len(plist)}")
     for i in plist:
@@ -43,14 +44,13 @@ def job_positions(page, defaults, easy_apply_form):
             ea = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
         except (TimeoutError, IndexError) as ex:
             continue
-
         # print(f"easy apply:: {ea}")
         print(f">>> use '{get_job_title(i)}'", )    
         ea.click()
         page.wait_for_timeout(1_000)
         progress = -1   # use to track current page, if page
         if easy_apply_form(page, defaults, progress):
-            save_defaults(defaults)
+            defaults.save()
             print(">>> easy apply form done")
             try:
                 page.wait_for_timeout(3_000)
@@ -60,12 +60,11 @@ def job_positions(page, defaults, easy_apply_form):
                 print(f"error: {ex}")
             i.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
             print(">>> don't show position again")
-            print(">>> easy apply continue")
         else:
             print(">>> easy apply form failed")
         print(">>> next position")
 
-def job_paginator(page, defaults, job_positions):
+def job_paginator(page, defaults: Defaults, job_positions):
     page.wait_for_timeout(1_000)
     if locator_exists(page, 'div.jobs-search-results-list__pagination'):
         pages = page.locator('div.jobs-search-results-list__pagination >> li[data-test-pagination-page-btn]').all()
@@ -96,6 +95,7 @@ def job_paginator(page, defaults, job_positions):
 def config():
     parser = argparse.ArgumentParser(description="LinkedIn Easy Apply Bot")
     parser.add_argument("--matcher", type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
+    parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug")
     args = parser.parse_args()
     return args
 
@@ -108,13 +108,13 @@ def run(engine: Playwright):
     for page in browser.contexts[0].pages:
         if page.url.startswith('https://www.linkedin.com/jobs/'):
             print(f">>> linkedin.com/jobs/ found")
-            defaults = {}
-            if not os.path.exists(DEFAULTS):
-                save_defaults(defaults)
-            with open(DEFAULTS, "r") as file:
-                defaults = yaml.safe_load(file)
+            defaults = Defaults()
+            if config().debug_easy_apply_form:
+                easy_apply_form(page, defaults, -1)
+                return
+
             job_paginator(page, defaults, job_positions)
-            save_defaults(defaults)
+            defaults.save()
             print(f"done")
             return
     print(">>> linkedin.com/jobs/ not found")

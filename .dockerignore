@@ -19,5 +19,4 @@ Dockerfile
 .env
 *.env
 # project specific
-data
 .*
