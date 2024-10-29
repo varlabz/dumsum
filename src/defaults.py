@@ -52,10 +52,13 @@ class Defaults:
             self.data = yaml.safe_load(file)
         if (embeddings := self.embeddings):
             docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split()
-            docs = filter_complex_metadata(docs)
+            docs = filter_complex_metadata(docs)    # remove arrays from metadata
+            # for doc in docs:
+            #     for md in doc.metadata:
+            #         doc.metadata[md] = str(doc.metadata[md])
             self.vectorstore = Chroma.from_documents(documents=docs, embedding=self.embeddings)
             if texts := [f"{k}:{v}" for k, v in self.data.items()]:
-                self.vectorstore.add_texts(texts=texts, embedding=embeddings)            
+                self.vectorstore.add_texts(texts=texts, embedding=embeddings, ids=[k for k in self.data.keys()])            
 
     def __getitem__(self, key):
         return self.get(key)
@@ -63,12 +66,13 @@ class Defaults:
     def __setitem__(self, key, value):
         self.data[key] = value
         if embeddings := self.embeddings:
-            self.vectorstore.add_texts(texts=[f"{key}:{value}"], embedding=embeddings)
+            self.vectorstore.delete(ids=[key])
+            self.vectorstore.add_texts(texts=[f"{key}:{value}"], embedding=embeddings, ids=[key])
 
-    # def pop(self, key):
-    #     self.data.pop(key)
-    #     if self.embeddings:
-    #         self.vectorstore.delete(ids=[key])
+    def pop(self, key):
+        self.data.pop(key)
+        if self.embeddings:
+            self.vectorstore.delete(ids=[key])
 
     def get(self, key, options: list = []) -> dict:
         if self.embeddings is None:
@@ -78,10 +82,10 @@ class Defaults:
         retriever = self.vectorstore.as_retriever(search_kwargs={"k": 6})
         docs = retriever.invoke(key)        
         docs = "\n".join([doc.page_content for doc in docs])
-        system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_FILE), ["CONTEXT"]).format(CONTEXT=docs,)    
+        system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_FILE), ["CONTEXT"]).format(
+            CONTEXT=docs,)    
         user = HumanMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_USER_FILE), ['QUESTION', 'OPTIONS']).format(
             QUESTION=key, OPTIONS="\n".join([f"- {i}" for i in options]))
-        # print(user)    
         prompt_template = ChatPromptTemplate.from_messages([system, user])
         try:
             chain = prompt_template | self.chat | JsonOutputParser() 

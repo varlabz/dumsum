@@ -28,5 +28,3 @@ Example JSON output:
   "explanation": "Brief explanation of the match percentage"
 }}
 ```
-
-# INPUT

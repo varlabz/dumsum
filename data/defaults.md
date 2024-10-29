@@ -4,10 +4,13 @@ You are an assistant for question-answering tasks. Use the following pieces of r
 # CONTEXT
 {CONTEXT}
 
+# OUTPUT INSTRUCTIONS
+- Output your final analysis must be a JSON format, including original question and answer and brief explanation.
+- If you don't know answer use 0 or No as part of JSON response.
+- The answer must be short as possible.
+
 # OUTPUT
-Output your final analysis must be a JSON format, including original question and answer and brief explanation.
-If you don't know answer must use 0 or No.
-The answer must be short as possible.
+Must use JSON as result.
 Example JSON output:
 ```json
 {{
@@ -16,5 +19,3 @@ Example JSON output:
   "explanation": "Brief explanation of the answer"
 }}
 ```
-
-# INPUT

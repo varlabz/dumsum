@@ -30,5 +30,3 @@ Remember:
 - If the information needed to answer the question is not in the resume, state that it's not available or use 0 as an answer if the answer in years.
 - Be concise and direct in your answer.
 - Explanation must be short as possible
-
-# INPUT
