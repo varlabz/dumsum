@@ -102,7 +102,6 @@ def check_required(dialog, defaults: Defaults, init):
 
 def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     # progress: -1 very first start, 0 - 1st page, 100 - last page
-    # click easy apply button
     print(">>> start easy apply form")
     while True:
         try:

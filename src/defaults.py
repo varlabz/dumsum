@@ -4,12 +4,15 @@ get/set default values key/value pair
 import argparse
 import os
 from typing import Final
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 import yaml
 from langchain_chroma import Chroma
+from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, \
     HumanMessagePromptTemplate
-from chat import _chat, answer
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
+from chat import RESUME_FILE, _chat, answer
 from common import get_data_file
 
 DEFAULTS: Final = "data/defaults.yaml"
@@ -47,9 +50,12 @@ class Defaults:
             self.save()
         with open(DEFAULTS, "r") as file:
             self.data = yaml.safe_load(file)
-        if (embeddings := self.embeddings) and self.data:
-            texts = [f"{k}:{v}" for k, v in self.data.items()]
-            self.vectorstore = Chroma.from_texts(texts=texts, embedding=embeddings)            
+        if (embeddings := self.embeddings):
+            docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split()
+            docs = filter_complex_metadata(docs)
+            self.vectorstore = Chroma.from_documents(documents=docs, embedding=self.embeddings)
+            if texts := [f"{k}:{v}" for k, v in self.data.items()]:
+                self.vectorstore.add_texts(texts=texts, embedding=embeddings)            
 
     def __getitem__(self, key):
         return self.get(key)
@@ -69,12 +75,10 @@ class Defaults:
             if v := self.data.get(key, None):
                 return {"question": key, "answer": v, "explanation": "No embeddings"}
             return None
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 6})
         docs = retriever.invoke(key)        
         docs = "\n".join([doc.page_content for doc in docs])
-        # print(docs)
         system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_FILE), ["CONTEXT"]).format(CONTEXT=docs,)    
-        # print(system)
         user = HumanMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_USER_FILE), ['QUESTION', 'OPTIONS']).format(
             QUESTION=key, OPTIONS="\n".join([f"- {i}" for i in options]))
         # print(user)    
@@ -86,8 +90,7 @@ class Defaults:
             return res
         except Exception as ex:
             print(f"Error decoding JSON: {ex}")
-            print(f">>> failed with defaults. will try with resume")
-            return answer(key)
+            return None
 
     def save(self):
         with open(DEFAULTS, "w") as file:
