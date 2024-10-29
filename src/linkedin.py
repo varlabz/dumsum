@@ -9,7 +9,7 @@ from defaults import Defaults
 from linkedin_easy_apply import easy_apply_form
 
 def get_job_title(page):
-    if l := locator_exists(page, 'a.job-card-list__title'):
+    if l := locator_exists(page, 'a.job-card-list__title >> span[aria-hidden="true"]'):
         return ' '.join(l.text_content().split())
     if l := locator_exists(page, 'a.job-card-job-posting-card-wrapper__card-link'):
         return ' '.join(l.text_content().split())

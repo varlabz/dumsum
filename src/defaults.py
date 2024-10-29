@@ -14,6 +14,7 @@ from common import get_data_file
 
 DEFAULTS: Final = "data/defaults.yaml"
 DEFAULTS_FILE: Final = "defaults.md"
+DEFAULTS_USER_FILE: Final = "defaults-user.md"
 
 def _embeddings():
     if os.environ.get("OPENAI_API_KEY"):
@@ -46,7 +47,7 @@ class Defaults:
             self.save()
         with open(DEFAULTS, "r") as file:
             self.data = yaml.safe_load(file)
-        if embeddings := self.embeddings:
+        if (embeddings := self.embeddings) and self.data:
             texts = [f"{k}:{v}" for k, v in self.data.items()]
             self.vectorstore = Chroma.from_texts(texts=texts, embedding=embeddings)            
 
@@ -63,7 +64,7 @@ class Defaults:
     #     if self.embeddings:
     #         self.vectorstore.delete(ids=[key])
 
-    def get(self, key) -> dict:
+    def get(self, key, options: list = []) -> dict:
         if self.embeddings is None:
             if v := self.data.get(key, None):
                 return {"question": key, "answer": v, "explanation": "No embeddings"}
@@ -74,7 +75,9 @@ class Defaults:
         # print(docs)
         system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_FILE), ["CONTEXT"]).format(CONTEXT=docs,)    
         # print(system)
-        user = HumanMessagePromptTemplate.from_template(key).format()                                                       
+        user = HumanMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_USER_FILE), ['QUESTION', 'OPTIONS']).format(
+            QUESTION=key, OPTIONS="\n".join([f"- {i}" for i in options]))
+        # print(user)    
         prompt_template = ChatPromptTemplate.from_messages([system, user])
         try:
             chain = prompt_template | self.chat | JsonOutputParser() 
@@ -93,7 +96,8 @@ class Defaults:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chat with defaults")
     parser.add_argument("-s", required=False, type=str, help="skill")
+    parser.add_argument('-a', nargs='*', help='An array of values')
     args = parser.parse_args()
     if hasattr(args, 's') and args.s:
         defaults = Defaults()
-        print(defaults.get(args.s))
+        print(defaults.get(args.s, args.a if args.a else []))

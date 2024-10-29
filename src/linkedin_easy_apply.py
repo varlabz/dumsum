@@ -17,9 +17,10 @@ def fieldset_radio(dialog, defaults: Defaults, init):
             if any((j:=i).is_checked() for i in inputs):
                 defaults[label] = j.get_attribute('data-test-text-selectable-option__input')
                 continue
-            if v := defaults[label]:
+            options = [i.get_attribute('data-test-text-selectable-option__input') for i in inputs]
+            print(f"### options: {options}")
+            if v := defaults.get(label, options):
                 print(f">>> answer for: '{label}' is '{v}'")
-                print(f"### options: {[i.get_attribute('data-test-text-selectable-option__input') for i in inputs]}")
                 if any(((k:=j).get_attribute('data-test-text-selectable-option__input').lower()) == (a:=v['answer'].lower()) for j in inputs):
                     k.locator('..').locator('label').click()    # direct click on radio doesn't work
         else:
@@ -31,10 +32,9 @@ def textarea(dialog, defaults: Defaults, init):
     req = dialog.locator('textarea[required]').all()
     # print(f"# textarea: {len(req)}")
     for r in req:
-        label = r.get_attribute['aria-label'].strip()
-        print(label)
+        label = r.get_attribute('aria-label').strip()
         val = r.input_value().strip()
-        print(f">>> textarea: '{label}'='{val}'///{defaults[label]}")
+        # print(f">>> textarea: '{label}'='{val}'")
         if init:
             if val:
                 continue
@@ -48,18 +48,36 @@ def textarea(dialog, defaults: Defaults, init):
             else:
                 defaults[label] = val
 
-def check_required(page, dialog, defaults: Defaults, init):
-    fieldset_radio(dialog, defaults, init)
-    textarea(dialog, defaults, init)
-    # check empty fields
+def select(dialog, defaults: Defaults, init):
+    req = dialog.locator('select[required],select[aria-required="true"]').all()
+    for r in req:
+        label = get_label(r)
+        val = r.input_value().strip()
+        # hack: get a selected index from selector
+        selected_index = dialog.page.eval_on_selector(f'select#{r.get_attribute("id")}', "select => select.selectedIndex")
+        # print(f">>> required select: '{label}'='{val}':{selected_index}///{defaults[label]}")
+        if init:
+            if selected_index != 0:
+                continue
+            options = [i.get_attribute('value') for i in r.locator('option').all()[1:]]
+            print(f"### options: {options}")
+            if v := defaults.get(label, options):
+                print(f">>> answer for: '{label}' is '{v}'")
+                r.select_option(v['answer'])
+                continue
+        else:
+            if selected_index == 0:
+                dialog.page.wait_for_timeout(10_000)
+            else:
+                defaults[label] = val
+
+def input_text(dialog, defaults: Defaults, init):
     req = dialog.locator('input[required],input[aria-required="true"]').all()
-    # print(f"# input required: {len(req)}")
     for i in req:
         label = get_label(i)
         val = i.input_value().strip()
         # print(f">>> required input: '{label}'='{val}' /// {defaults[label]}")
         if i.get_attribute('type') == "radio":  # special case for radio buttons
-            # check_radio(i) # TODO do it right way. use label and radio buttons as values
             pass
         else:
             if init:
@@ -72,30 +90,15 @@ def check_required(page, dialog, defaults: Defaults, init):
             else:
                 if not val:
                     print(f">>> required input is empty: '{label}'")
-                    page.wait_for_timeout(10_000)
+                    dialog.page.wait_for_timeout(10_000)
                 else:
                     defaults[label] = val
 
-    req = dialog.locator('select[required],select[aria-required="true"]').all()
-    # print(f"# select required: {len(req)}")
-    for i in req:
-        label = get_label(i)
-        val = i.input_value().strip()
-        # hack: get a selected index from selector
-        selected_index = page.eval_on_selector(f'select#{i.get_attribute("id")}', "select => select.selectedIndex")
-        # print(f">>> required select: '{label}'='{val}':{selected_index}///{defaults[label]}")
-        if init:
-            if selected_index != 0:
-                continue
-            if v := defaults.get(label):
-                print(f">>> answer for: '{label}' is '{v}'")
-                i.select_option(v['answer'])
-                continue
-        else:
-            if selected_index == 0:
-                page.wait_for_timeout(10_000)
-            else:
-                defaults[label] = val
+def check_required(dialog, defaults: Defaults, init):
+    fieldset_radio(dialog, defaults, init)
+    textarea(dialog, defaults, init)
+    select(dialog, defaults, init)
+    input_text(dialog, defaults, init)
 
 def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     # progress: -1 very first start, 0 - 1st page, 100 - last page
@@ -115,7 +118,7 @@ def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
             else:   # don't have progress bar
                 init = False
 
-            check_required(page, dialog, defaults, init)
+            check_required(dialog, defaults, init)
             defaults.save()
 
             if optional_locator(dialog, 'button >> span:text-is("Skip")', lambda x: x.click()):
