@@ -28,24 +28,21 @@ def use_matcher(job: str) -> bool:
 def job_positions(page, defaults: Defaults, easy_apply_form):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
     print(f"# positions: {len(plist)}")
-    for i in plist:
-        if locator_exists(i, 'button[aria-label$="job is dismissed, undo"]'):
-            print(f">>> skip: {get_job_title(i)}")
+    for p in plist:
+        if locator_exists(p, 'button[aria-label$="job is dismissed, undo"]'):
+            print(f">>> skip: {get_job_title(p)}")
             continue
-        # print(f'>>> position {i.locator('a[label]')}')
-        i.click()
+        p.click()
         page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')
         job_description = detail.locator('article.jobs-description__container >> div.mt4').text_content().strip()
-        # print(f">>> job description: {job_description}")
+        print(f">>> try '{get_job_title(p)}'", )    
         if not use_matcher(job_description):
             continue
         try:
             ea = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
         except (TimeoutError, IndexError) as ex:
             continue
-        # print(f"easy apply:: {ea}")
-        print(f">>> use '{get_job_title(i)}'", )    
         ea.click()
         page.wait_for_timeout(1_000)
         progress = -1   # use to track current page, if page
@@ -58,7 +55,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                 page.locator('div[role="dialog"]').locator('button[aria-label="Dismiss"]').click()
             except Exception as ex:
                 print(f"error: {ex}")
-            i.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
+            p.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
             print(">>> don't show position again")
         else:
             print(">>> easy apply form failed")

@@ -5,4 +5,6 @@ langchain-groq
 langchain-openai
 langchain-ollama
 langchain_chroma
+langchain_text_splitters
+langchain_community
 unstructured[md]

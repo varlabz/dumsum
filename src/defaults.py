@@ -4,7 +4,7 @@ get/set default values key/value pair
 import argparse
 import os
 from typing import Final
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import MarkdownHeaderTextSplitter, MarkdownTextSplitter, RecursiveCharacterTextSplitter
 import yaml
 from langchain_chroma import Chroma
 from langchain_community.vectorstores.utils import filter_complex_metadata
@@ -12,11 +12,11 @@ from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, \
     HumanMessagePromptTemplate
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
-from chat import RESUME_FILE, _chat, answer
+from chat import RESUME_FILE, _chat, answer, read_file_content
 from common import get_data_file
 
 DEFAULTS: Final = "data/defaults.yaml"
-DEFAULTS_FILE: Final = "defaults.md"
+DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
 DEFAULTS_USER_FILE: Final = "defaults-user.md"
 
 def _embeddings():
@@ -51,11 +51,8 @@ class Defaults:
         with open(DEFAULTS, "r") as file:
             self.data = yaml.safe_load(file)
         if (embeddings := self.embeddings):
-            docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split()
+            docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split(text_splitter=MarkdownTextSplitter())
             docs = filter_complex_metadata(docs)    # remove arrays from metadata
-            # for doc in docs:
-            #     for md in doc.metadata:
-            #         doc.metadata[md] = str(doc.metadata[md])
             self.vectorstore = Chroma.from_documents(documents=docs, embedding=self.embeddings)
             if texts := [f"{k}:{v}" for k, v in self.data.items()]:
                 self.vectorstore.add_texts(texts=texts, embedding=embeddings, ids=[k for k in self.data.keys()])            
@@ -69,10 +66,10 @@ class Defaults:
             self.vectorstore.delete(ids=[key])
             self.vectorstore.add_texts(texts=[f"{key}:{value}"], embedding=embeddings, ids=[key])
 
-    def pop(self, key):
-        self.data.pop(key)
-        if self.embeddings:
-            self.vectorstore.delete(ids=[key])
+    # def pop(self, key):
+    #     self.data.pop(key)
+    #     if self.embeddings:
+    #         self.vectorstore.delete(ids=[key])
 
     def get(self, key, options: list = []) -> dict:
         if self.embeddings is None:
@@ -82,7 +79,7 @@ class Defaults:
         retriever = self.vectorstore.as_retriever(search_kwargs={"k": 6})
         docs = retriever.invoke(key)        
         docs = "\n".join([doc.page_content for doc in docs])
-        system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_FILE), ["CONTEXT"]).format(
+        system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_SYSTEM_FILE), ["CONTEXT"]).format(
             CONTEXT=docs,)    
         user = HumanMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_USER_FILE), ['QUESTION', 'OPTIONS']).format(
             QUESTION=key, OPTIONS="\n".join([f"- {i}" for i in options]))
