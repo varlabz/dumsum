@@ -42,7 +42,11 @@ def fieldset_checkbox(dialog, defaults: Defaults, init):
                 continue
             options = [i.get_attribute('data-test-text-selectable-option__input') for i in inputs]
             print(f"### options: {options}")
-            if v := defaults.get(label, options):
+            if len(options) == 1: # single choice, click and continue
+                print(f">>> option for: '{label}' is '{options[0]}', click and continue")
+                k.locator('..').locator('label').click()    # direct click on radio doesn't work
+                continue    # don't add to defaults 1 option
+            elif v := defaults.get(label, options):
                 print(f">>> answer for: '{label}' is '{v}'")
                 if any(((k:=j).get_attribute('data-test-text-selectable-option__input').lower()) == (a:=v['answer'].lower()) for j in inputs):
                     k.locator('..').locator('label').click()    # direct click on radio doesn't work

@@ -20,11 +20,11 @@ DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
 DEFAULTS_USER_FILE: Final = "defaults-user.md"
 
 def _embeddings():
-    if os.environ.get("OPENAI_API_KEY"):
+    if key:=os.environ.get("OPENAI_API_KEY"):
         print("Using OpenAI embeddings")
         from langchain_openai import OpenAIEmbeddings
         return OpenAIEmbeddings(
-            api_key=os.environ.get("OPENAI_API_KEY"),
+            api_key=key,
         )
 
     if os.environ.get("GROQ_API_KEY"):
@@ -34,6 +34,13 @@ def _embeddings():
     if os.environ.get("ANTHROPIC_API_KEY"):    
         print("Using Anthropic embeddings NO")
         return None
+    
+    if key:=os.environ.get("JINA_API_KEY"):
+        print("Using JinaAI embeddings")
+        from langchain_community.embeddings import JinaEmbeddings
+        return JinaEmbeddings(
+            jina_api_key=key, 
+        )
 
     print("Using Ollama embeddings")
     from langchain_ollama import OllamaEmbeddings
@@ -65,11 +72,6 @@ class Defaults:
         if embeddings := self.embeddings:
             self.vectorstore.delete(ids=[key])
             self.vectorstore.add_texts(texts=[f"{key}:{value}"], embedding=embeddings, ids=[key])
-
-    # def pop(self, key):
-    #     self.data.pop(key)
-    #     if self.embeddings:
-    #         self.vectorstore.delete(ids=[key])
 
     def get(self, key, options: list = []) -> dict:
         if self.embeddings is None:
