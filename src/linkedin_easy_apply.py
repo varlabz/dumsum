@@ -118,7 +118,7 @@ def input_text(dialog, defaults: Defaults, init):
             else:
                 defaults[label] = val
 
-def check_required(dialog, defaults: Defaults, init):
+def check_required(dialog, defaults: Defaults, init: bool):
     fieldset_radio(dialog, defaults, init)
     fieldset_checkbox(dialog, defaults, init)
     textarea(dialog, defaults, init)
@@ -152,10 +152,14 @@ def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
 
             if optional_locator(dialog, 'button >> span:text-is("Next")', lambda x: x.click()):
                 print(">>> next")
+                check_required(dialog, defaults, False)
+                defaults.save()
                 continue
 
             if optional_locator(dialog, 'button >> span:text-is("Review")', lambda x: x.click()):
                 print(">>> review")
+                check_required(dialog, defaults, False)
+                defaults.save()
                 continue
 
             def follow_check(label): # hack: can't click, set uncheck, have to use label

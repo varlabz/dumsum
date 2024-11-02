@@ -111,6 +111,7 @@ def run(engine: Playwright):
                 return
 
             job_paginator(page, defaults, job_positions)
+            # job_paginator(page, defaults, lambda _,__,___: print("call"))
             defaults.save()
             print(f"done")
             return

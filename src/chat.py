@@ -34,7 +34,8 @@ def _chat():
             api_key=key,
             # model="gpt-4o",
             model="gpt-4o-mini",
-            temperature=0.5,
+            temperature=0.7,
+            seed=1234,
         )
 
     if key:=os.environ.get("GROQ_API_KEY"):
@@ -60,7 +61,7 @@ def _chat():
         from langchain_community.chat_models import JinaChat
         return JinaChat(
             jinachat_api_key=key,
-            temperature=0.1,
+            temperature=0.5,
         )
 
     print("Using Ollama")
@@ -69,7 +70,9 @@ def _chat():
         model="llama3.2",    
         # model="qwen2.5:14b",
         # model="phi3.5:latest",
-        temperature=0,
+        temperature=0.7,
+        num_ctx=2048*4,
+        seed=12345,
     )
 
 def matcher(job: str):
