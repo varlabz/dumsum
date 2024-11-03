@@ -19,6 +19,9 @@ def use_matcher(job: str) -> bool:
     if config().matcher:
         match = matcher(job) 
         print(f">>> matcher: {match}")
+        if config().debug_matcher:
+            print(f">>> --debug-matcher is on")
+            return False
         if match is None:
             return False
         return int(float(match['match'])) >= config().matcher
@@ -94,6 +97,7 @@ def config():
     parser = argparse.ArgumentParser(description="LinkedIn Easy Apply Bot")
     parser.add_argument("--matcher", type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
     parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug")
+    parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug")
     args = parser.parse_args()
     return args
 

@@ -34,7 +34,7 @@ def _chat():
             api_key=key,
             # model="gpt-4o",
             model="gpt-4o-mini",
-            temperature=0.7,
+            temperature=0.5,
             seed=1234,
         )
 
@@ -70,7 +70,7 @@ def _chat():
         model="llama3.2",    
         # model="qwen2.5:14b",
         # model="phi3.5:latest",
-        temperature=0.7,
+        temperature=0,
         num_ctx=2048*4,
         seed=12345,
     )

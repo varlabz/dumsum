@@ -45,7 +45,8 @@ def _embeddings():
     print("Using Ollama embeddings")
     from langchain_ollama import OllamaEmbeddings
     return OllamaEmbeddings(
-        model="mxbai-embed-large",
+        # model="mxbai-embed-large",
+        model="nomic-embed-text",
     )
 
 class Defaults:
@@ -71,7 +72,7 @@ class Defaults:
     def save(self):
         timestamp = os.path.getmtime(DEFAULTS)
         if timestamp != self.timestamp:
-            print(f">>> {DEFAULTS} has been modified. Will use updated")
+            print(f">>> {DEFAULTS} has been modified. Will use updated on next position")
             return
         with open(DEFAULTS, "w") as file:
             yaml.dump(self.data, file, width=float('inf'), default_flow_style=False, sort_keys=False)  
