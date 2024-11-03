@@ -46,6 +46,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         ea.click()
         page.wait_for_timeout(1_000)
         progress = -1   # use to track current page, if page
+        defaults.reset()
         if easy_apply_form(page, defaults, progress):
             defaults.save()
             print(">>> easy apply form done")

@@ -55,14 +55,9 @@ class Defaults:
         self.data = {}
         if not os.path.exists(DEFAULTS):
             self.save()
-        with open(DEFAULTS, "r") as file:
-            self.data = yaml.safe_load(file)
         if (embeddings := self.embeddings):
-            docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split(text_splitter=MarkdownTextSplitter())
-            docs = filter_complex_metadata(docs)    # remove arrays from metadata
-            self.vectorstore = Chroma.from_documents(documents=docs, embedding=self.embeddings)
-            if texts := [f"{k}:{v}" for k, v in self.data.items()]:
-                self.vectorstore.add_texts(texts=texts, embedding=embeddings, ids=[k for k in self.data.keys()])            
+            self.vectorstore = Chroma(embedding_function=embeddings)
+        self.reset()
 
     def __getitem__(self, key):
         return self.get(key)
@@ -72,6 +67,27 @@ class Defaults:
         if embeddings := self.embeddings:
             self.vectorstore.delete(ids=[key])
             self.vectorstore.add_texts(texts=[f"{key}:{value}"], embedding=embeddings, ids=[key])
+
+    def save(self):
+        timestamp = os.path.getmtime(DEFAULTS)
+        if timestamp != self.timestamp:
+            print(f">>> {DEFAULTS} has been modified. Will use updated")
+            return
+        with open(DEFAULTS, "w") as file:
+            yaml.dump(self.data, file, width=float('inf'), default_flow_style=False, sort_keys=False)  
+            self.timestamp = os.path.getmtime(DEFAULTS)
+
+    def reset(self):
+        with open(DEFAULTS, "r") as file:
+            self.data = yaml.safe_load(file)
+            self.timestamp = os.path.getmtime(DEFAULTS)
+        if (embeddings := self.embeddings):
+            self.vectorstore.reset_collection()
+            docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split(text_splitter=MarkdownTextSplitter())
+            docs = filter_complex_metadata(docs)    # remove arrays from metadata
+            self.vectorstore.from_documents(documents=docs, embedding=self.embeddings)
+            if texts := [f"{k}:{v}" for k, v in self.data.items()]:
+                self.vectorstore.add_texts(texts=texts, embedding=embeddings, ids=[k for k in self.data.keys()])            
 
     def get(self, key, options: list = []) -> dict:
         if self.embeddings is None:
@@ -94,10 +110,6 @@ class Defaults:
         except Exception as ex:
             print(f"Error decoding JSON: {ex}")
             return None
-
-    def save(self):
-        with open(DEFAULTS, "w") as file:
-            yaml.dump(self.data, file, width=float('inf'), default_flow_style=False, sort_keys=False)  
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chat with defaults")
