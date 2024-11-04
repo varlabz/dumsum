@@ -53,6 +53,7 @@ def config():
     parser.add_argument("--speed", type=int, required=False, default=0, help="Speed of the process. 0 - slow(default), 1 - fast")
     parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug")
     parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug")
+    parser.add_argument("--debug-1page", action='store_true', default=False, required=False, help="Debug")
     args = parser.parse_args()
     return args
 

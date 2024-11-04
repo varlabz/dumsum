@@ -110,9 +110,10 @@ def run(engine: Playwright):
             if config().debug_easy_apply_form:
                 easy_apply_form(page, defaults, -1)
                 return
-
-            job_paginator(page, defaults, job_positions)
-            # job_paginator(page, defaults, lambda _,__,___: print("call"))
+            if config().debug_1page:
+                job_positions(page, defaults, easy_apply_form)
+            else:    
+                job_paginator(page, defaults, job_positions)
             defaults.save()
             print(f"done")
             return
