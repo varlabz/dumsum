@@ -26,7 +26,7 @@ def use_matcher(job: str) -> tuple[str, bool]:
         if config().debug_matcher:
             print(f">>> --debug-matcher is on")
             return (match, True)
-        return (match, match <= config().matcher)
+        return (match, match < config().matcher)
     else:
         return (-1, False)
 
