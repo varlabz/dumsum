@@ -1,8 +1,5 @@
-import argparse
 import os
-import yaml
 from playwright.sync_api import sync_playwright, Playwright
-from chat import answer
 from chat import matcher
 from common import *
 from defaults import Defaults
@@ -54,7 +51,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
             defaults.save()
             print(">>> easy apply form done")
             try:
-                page.wait_for_timeout(3_000)
+                page.wait_for_timeout(2_000)
                 page.wait_for_selector('div[role="dialog"]')
                 page.locator('div[role="dialog"]').locator('button[aria-label="Dismiss"]').click()
             except Exception as ex:
@@ -92,14 +89,6 @@ def job_paginator(page, defaults: Defaults, job_positions):
             job_positions(page, defaults, easy_apply_form)
     else:
         job_positions(page, defaults, easy_apply_form)
-
-def config():
-    parser = argparse.ArgumentParser(description="LinkedIn Easy Apply Bot")
-    parser.add_argument("--matcher", type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
-    parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug")
-    parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug")
-    args = parser.parse_args()
-    return args
 
 def run(engine: Playwright):
     if hasattr(config(), 'help'):

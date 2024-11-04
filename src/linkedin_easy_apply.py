@@ -1,7 +1,7 @@
-import yaml
-from chat import answer
 from common import *
 from defaults import Defaults
+
+TIMEOUT = 1_000 if config().speed else 30_000
 
 def fieldset_radio(dialog, defaults: Defaults, init):
     req = dialog.locator('fieldset:has(input[type="radio"][aria-required="true"])').all()
@@ -69,7 +69,7 @@ def textarea(dialog, defaults: Defaults, init):
         val = r.input_value().strip()
         if not val:
             print(f">>> textarea is empty: '{label}'")
-            dialog.page.wait_for_timeout(10_000)
+            dialog.page.wait_for_timeout(TIMEOUT)
         else:
             defaults[label] = val
 
@@ -92,7 +92,7 @@ def select(dialog, defaults: Defaults, init):
         selected_index = dialog.page.eval_on_selector(f'select#{r.get_attribute("id")}', "select => select.selectedIndex")
         if selected_index == 0:
             print(f">>> select is not complete: '{label}'")
-            dialog.page.wait_for_timeout(10_000)
+            dialog.page.wait_for_timeout(TIMEOUT)
         else:
             defaults[label] = val
 
@@ -114,7 +114,7 @@ def input_text(dialog, defaults: Defaults, init):
             val = i.input_value().strip()
             if not val:
                 print(f">>> required input is empty: '{label}'")
-                dialog.page.wait_for_timeout(10_000)
+                dialog.page.wait_for_timeout(TIMEOUT)
             else:
                 defaults[label] = val
 
@@ -131,10 +131,9 @@ def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     print(">>> start easy apply form")
     while True:
         try:
-            page.wait_for_timeout(15_000)
+            page.wait_for_timeout(TIMEOUT)
             page.wait_for_selector('div[role="dialog"]', state="visible")
             dialog = page.locator('div[role="dialog"]')
-
             if locator_exists(dialog, 'progress[value]'):
                 current_progress = int(float(dialog.locator('progress[value]').get_attribute('value')))
                 # print(f">>> progress: {current_progress} -> {progress}")
@@ -142,40 +141,32 @@ def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
                 progress = current_progress
             else:   # don't have progress bar
                 init = False
-
             check_required(dialog, defaults, init)
             defaults.save()
-
             if optional_locator(dialog, 'button >> span:text-is("Skip")', lambda x: x.click()):
                 print(">>> skip")
                 continue
-
             if optional_locator(dialog, 'button >> span:text-is("Next")', lambda x: x.click()):
                 print(">>> next")
                 check_required(dialog, defaults, False)
                 defaults.save()
                 continue
-
             if optional_locator(dialog, 'button >> span:text-is("Review")', lambda x: x.click()):
                 print(">>> review")
                 check_required(dialog, defaults, False)
                 defaults.save()
                 continue
-
             def follow_check(label): # hack: can't click, set uncheck, have to use label
                 check = optional_locator(dialog, 'input[id="follow-company-checkbox"]', lambda x: x)
                 if check and check.is_checked():
                     label.click()
             optional_locator(dialog, 'label[for="follow-company-checkbox"]', lambda x: follow_check(x))
-
             if locator_exists(dialog, 'button >> span:text-is("Submit application")'):
                 print(">>> ready to submit")
-                page.wait_for_timeout(30_000)
+                page.wait_for_timeout(TIMEOUT)  # time for review
                 if optional_locator(dialog, 'button >> span:text-is("Submit application")', lambda x: x.click()):
                     print(">>> submit")
                     return True
-
         except Exception as ex:
             print(f"error: {ex}")
             return False
-
