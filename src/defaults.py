@@ -95,7 +95,7 @@ class Defaults:
             if v := self.data.get(key, None):
                 return {"question": key, "answer": v, "explanation": "No embeddings"}
             return None
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 6})
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
         docs = retriever.invoke(key)        
         docs = "\n".join([doc.page_content for doc in docs])
         system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_SYSTEM_FILE), ["CONTEXT"]).format(
