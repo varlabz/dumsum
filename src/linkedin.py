@@ -12,18 +12,23 @@ def get_job_title(page):
         return ' '.join(l.text_content().split())
     return None
 
-def use_matcher(job: str) -> bool: 
+def set_match(page, match):
+    if l := locator_exists(page, 'a.job-card-list__title >> span[aria-hidden="true"] >> strong'):
+        l.evaluate(f"(element) => element.innerText += ' ({match}%)'")
+
+def use_matcher(job: str) -> tuple[str, bool]: 
     if config().matcher:
         match = matcher(job) 
         print(f">>> matcher: {match}")
+        if match is None:
+            return (match, True)
+        match = int(float(match['match']))
         if config().debug_matcher:
             print(f">>> --debug-matcher is on")
-            return False
-        if match is None:
-            return False
-        return int(float(match['match'])) >= config().matcher
+            return (match, True)
+        return (match, match <= config().matcher)
     else:
-        return True
+        return (-1, False)
 
 def job_positions(page, defaults: Defaults, easy_apply_form):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
@@ -37,7 +42,9 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         detail = page.locator('div.scaffold-layout__detail')
         job_description = detail.locator('article.jobs-description__container >> div.mt4').text_content().strip()
         print(f">>> try '{get_job_title(p)}'", )    
-        if not use_matcher(job_description):
+        (match, skip) = use_matcher(job_description)
+        set_match(p, match)
+        if skip:
             continue
         try:
             ea = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
