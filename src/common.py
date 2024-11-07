@@ -49,7 +49,8 @@ def get_data_file(file: str):
 
 def config():
     parser = argparse.ArgumentParser(description="LinkedIn Easy Apply Bot")
-    parser.add_argument("--matcher", type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
+    parser.add_argument("--matcher", default=70, type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
+    parser.add_argument("--matcher-ignore", default=50, type=int, required=False, help="Use resume matcher to mark as ignore. Specify a percentage (0-100) for matching threshold.")
     parser.add_argument("--speed", type=int, required=False, default=0, help="Speed of the process. 0 - slow(default), 1 - fast")
     parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug")
     parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug")

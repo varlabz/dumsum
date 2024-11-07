@@ -53,7 +53,7 @@ To enable Chrome's remote debugging feature, follow these steps:
 or
 
 **Build the Docker Image from a Git Repository**  
-   If your Dockerfile is hosted in a Git repository, you can build the image directly from the repository. Ensure that you have your GitHub authentication token, then use this command:
+   You can build the image directly from the repository. Ensure that you have your GitHub authentication token, then use this command:
    ```bash
    docker build -t linkedin-pw https://${GIT_AUTH_TOKEN}@github.com/var-lab/dumsum.git
    ```
@@ -63,7 +63,7 @@ or
 
 **Pull Pre-built Docker Image (recommended)**
  
-   Alternatively, you can pull the image directly using:
+   You can pull the image directly using:
    ```bash
    docker pull testlabz/linkedin-pw
    ```

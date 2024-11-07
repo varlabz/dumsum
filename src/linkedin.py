@@ -21,14 +21,14 @@ def use_matcher(job: str) -> tuple[str, bool]:
         match = matcher(job) 
         print(f">>> matcher: {match}")
         if match is None:
-            return (match, True)
+            return ('?', True)
         match = int(float(match['match']))
         if config().debug_matcher:
             print(f">>> --debug-matcher is on")
             return (match, True)
         return (match, match < config().matcher)
     else:
-        return (-1, False)
+        return (0, False)
 
 def job_positions(page, defaults: Defaults, easy_apply_form):
     plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
@@ -44,6 +44,9 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         print(f">>> try '{get_job_title(p)}'", )    
         (match, skip) = use_matcher(job_description)
         set_match(p, match)
+        if 1 <= int(match) <= config().matcher_ignore:
+            p.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
+            print(">>> don't show position again. match is too low")
         if skip:
             continue
         try:
