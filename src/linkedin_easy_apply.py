@@ -163,7 +163,7 @@ def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
             optional_locator(dialog, 'label[for="follow-company-checkbox"]', lambda x: follow_check(x))
             if locator_exists(dialog, 'button >> span:text-is("Submit application")'):
                 print(">>> ready to submit")
-                page.wait_for_timeout(TIMEOUT)  # time for review
+                page.wait_for_timeout(30_000)  # time for review
                 if optional_locator(dialog, 'button >> span:text-is("Submit application")', lambda x: x.click()):
                     print(">>> submit")
                     return True
