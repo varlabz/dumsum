@@ -14,7 +14,7 @@ def get_job_title(page):
 
 def set_match(page, match):
     if l := locator_exists(page, 'a.job-card-list__title >> span[aria-hidden="true"] >> strong'):
-        l.evaluate(f"(element) => element.innerText += ' ({match}%)'")
+        l.evaluate(f"(element) => element.innerText += ' [{match}%]'")
 
 def use_matcher(job: str) -> tuple[str, bool]: 
     if config().matcher:
@@ -42,6 +42,10 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         detail = page.locator('div.scaffold-layout__detail')
         job_description = detail.locator('article.jobs-description__container >> div.mt4').text_content().strip()
         print(f">>> try '{get_job_title(p)}'", )    
+        try:
+            easy_apply_btn = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
+        except (TimeoutError, IndexError) as ex:
+            continue
         (match, skip) = use_matcher(job_description)
         set_match(p, match)
         if 1 <= int(match) <= config().matcher_ignore:
@@ -49,12 +53,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
             print(">>> don't show position again. match is too low")
         if skip:
             continue
-        try:
-            ea = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
-        except (TimeoutError, IndexError) as ex:
-            continue
-        ea.click()
-        page.wait_for_timeout(1_000)
+        easy_apply_btn.click()
         progress = -1   # use to track current page, if page
         defaults.reset()
         if easy_apply_form(page, defaults, progress):

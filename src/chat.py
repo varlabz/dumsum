@@ -70,9 +70,9 @@ def _chat():
         model="llama3.2",    
         # model="qwen2.5:14b",
         # model="phi3.5:latest",
-        temperature=0,
-        num_ctx=2048*4,
-        seed=12345,
+        temperature=0.7,
+        num_ctx=2048*2,
+        seed=123,
     )
 
 def matcher(job: str):
