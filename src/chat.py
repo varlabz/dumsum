@@ -5,10 +5,12 @@ from typing import Final
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, \
     HumanMessagePromptTemplate
+from langchain_core.messages import HumanMessage
 
 from common import get_data_file
 
 HR_FILE: Final = "hr.md"
+HR_FALLBACK_FILE: Final = "hr-fallback.md"
 SKILLS_FILE: Final = "skills.md"
 RESUME_FILE: Final = "data/resume.md"       # should use user updated resume file
 
@@ -70,7 +72,7 @@ def _chat():
         model="llama3.2",    
         # model="qwen2.5:14b",
         # model="phi3.5:latest",
-        temperature=0.7,
+        temperature=0,
         num_ctx=2048*2,
         seed=123,
     )
@@ -79,6 +81,21 @@ def matcher(job: str):
     chat = _chat()
     system = SystemMessagePromptTemplate.from_template_file(get_data_file(HR_FILE), ['JOB_DESCRIPTION']).format(JOB_DESCRIPTION=job,)    
     user = HumanMessagePromptTemplate.from_template_file(RESUME_FILE, []).format()                                                       
+    prompt_template = ChatPromptTemplate.from_messages([system, user])
+    try:
+        chain = prompt_template | chat | JsonOutputParser() 
+        res = chain.invoke({})
+        # print(res)
+        return res
+    except Exception as ex:
+        print(f"Error decoding JSON: {ex}")
+        # after hallucination take ex and call chat to convert response to json structure with expected format
+        return matcher_fallback(ex.args[0])
+
+def matcher_fallback(answer: str):
+    chat = _chat()
+    system = SystemMessagePromptTemplate.from_template_file(get_data_file(HR_FALLBACK_FILE), []).format()    
+    user = HumanMessage(content=answer)                                                       
     prompt_template = ChatPromptTemplate.from_messages([system, user])
     try:
         chain = prompt_template | chat | JsonOutputParser() 
@@ -109,9 +126,12 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser(description="Chat with AI")
         parser.add_argument("-j", required=False, type=str, help="Job description file")
         parser.add_argument("-s", required=False, type=str, help="skill")
+        parser.add_argument("-f", required=False, type=str, help="fallback")
         args = parser.parse_args()
         if hasattr(args, 'j') and args.j:
             return matcher(read_file_content(args.j))
+        if hasattr(args, 'f') and args.f:
+            return matcher_fallback(args.f)
         if hasattr(args, 's') and args.s:
             return answer(args.s)
     

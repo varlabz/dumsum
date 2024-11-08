@@ -41,7 +41,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')
         job_description = detail.locator('article.jobs-description__container >> div.mt4').text_content().strip()
-        print(f">>> try '{get_job_title(p)}'", )    
+        print(f">>> use '{get_job_title(p)}'", )    
         try:
             easy_apply_btn = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
         except (TimeoutError, IndexError) as ex:

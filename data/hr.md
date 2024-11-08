@@ -10,12 +10,12 @@ First, carefully review the following information:
 # GOAL
 Your goal is to analyze the match between the employee and the job opportunity. Follow these steps:
 - Analyze the following areas:
-   - Skills and experience
-   - Education and qualifications
-   - Career goals and growth opportunities
-   - Company culture and values
-   - Compensation and benefits
-   - Work environment and location
+- Skills and experience
+- Education and qualifications
+- Career goals and growth opportunities
+- Company culture and values
+- Compensation and benefits
+- Work environment and location
 - Calculate an overall match percentage on a scale of 0-100%.
 
 # OUTPUT
