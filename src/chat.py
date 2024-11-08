@@ -69,11 +69,11 @@ def _chat():
     print("Using Ollama")
     from langchain_ollama import ChatOllama
     return ChatOllama(
-        model="llama3.2",    
-        # model="qwen2.5:14b",
+        # model="llama3.2",    
+        model="qwen2.5:14b",
         # model="phi3.5:latest",
-        temperature=0,
-        num_ctx=2048*2,
+        temperature=0.5,
+        num_ctx=2048*4,
         seed=123,
     )
 

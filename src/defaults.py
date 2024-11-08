@@ -45,8 +45,8 @@ def _embeddings():
     print("Using Ollama embeddings")
     from langchain_ollama import OllamaEmbeddings
     return OllamaEmbeddings(
-        # model="mxbai-embed-large",
-        model="nomic-embed-text",
+        model="mxbai-embed-large",
+        # model="nomic-embed-text",
     )
 
 class Defaults:
