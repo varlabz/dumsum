@@ -52,13 +52,9 @@ def _embeddings():
 class Defaults:
     def __init__(self):
         self.chat = _chat()
-        self.embeddings = _embeddings()
         self.data = {}
         if not os.path.exists(DEFAULTS):
             self.save()
-        if (embeddings := self.embeddings):
-            self.vectorstore = Chroma(embedding_function=embeddings)
-        self.reset()
 
     def __getitem__(self, key):
         return self.get(key)
@@ -78,17 +74,18 @@ class Defaults:
             yaml.dump(self.data, file, width=float('inf'), default_flow_style=False, sort_keys=False)  
             self.timestamp = os.path.getmtime(DEFAULTS)
 
-    def reset(self):
+    def load(self):
         with open(DEFAULTS, "r") as file:
             self.data = yaml.safe_load(file)
             self.timestamp = os.path.getmtime(DEFAULTS)
-        if (embeddings := self.embeddings):
-            self.vectorstore.reset_collection()
+        self.embeddings = _embeddings()
+        if self.embeddings:
+            self.vectorstore = Chroma(embedding_function=self.embeddings)
             docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split(text_splitter=MarkdownTextSplitter())
             docs = filter_complex_metadata(docs)    # remove arrays from metadata
             self.vectorstore.from_documents(documents=docs, embedding=self.embeddings)
             if texts := [f"{k}:{v}" for k, v in self.data.items()]:
-                self.vectorstore.add_texts(texts=texts, embedding=embeddings, ids=[k for k in self.data.keys()])            
+                self.vectorstore.add_texts(texts=texts, embedding=self.embeddings, ids=[k for k in self.data.keys()])            
 
     def get(self, key, options: list = []) -> dict:
         if self.embeddings is None:
@@ -117,6 +114,6 @@ if __name__ == "__main__":
     parser.add_argument("-s", required=False, type=str, help="skill")
     parser.add_argument('-a', nargs='*', help='An array of values')
     args = parser.parse_args()
-    if hasattr(args, 's') and args.s:
+    if 's' in args and args.s:
         defaults = Defaults()
         print(defaults.get(args.s, args.a if args.a else []))

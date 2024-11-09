@@ -39,6 +39,18 @@ def _chat():
             temperature=0.5,
             seed=1234,
         )
+    
+    if key:=os.environ.get("XAI_API_KEY"):
+        print("Using XAI")
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            api_key=key,
+            base_url="https://api.x.ai/v1/",
+            # model="gpt-4o",
+            model="grok-beta",
+            temperature=0.5,
+            seed=1234,
+        )
 
     if key:=os.environ.get("GROQ_API_KEY"):
         print("Using Groq")

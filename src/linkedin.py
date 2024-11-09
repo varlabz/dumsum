@@ -55,7 +55,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
             continue
         easy_apply_btn.click()
         progress = -1   # use to track current page, if page
-        defaults.reset()
+        defaults.load()
         if easy_apply_form(page, defaults, progress):
             defaults.save()
             print(">>> easy apply form done")
