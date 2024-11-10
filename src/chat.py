@@ -46,7 +46,6 @@ def _chat():
         return ChatOpenAI(
             api_key=key,
             base_url="https://api.x.ai/v1/",
-            # model="gpt-4o",
             model="grok-beta",
             temperature=0.5,
             seed=1234,

@@ -116,7 +116,6 @@ def run(engine: Playwright):
                 job_positions(page, defaults, easy_apply_form)
             else:    
                 job_paginator(page, defaults, job_positions)
-            defaults.save()
             print(f"done")
             return
     print(">>> linkedin.com/jobs/ not found")
