@@ -1,9 +1,64 @@
+## The Goal of the project
+This tool automates the LinkedIn "Easy Apply" process by:
+- Streamlining the application workflow
+- Walking through questionnaire steps automatically
+- Reducing application submission time
+- Maintaining application quality while improving efficiency
+
+Benefits:
+- Faster application submissions
+- Consistent application process
+- Reduced manual effort
+- Better time management for job seekers
+
 ## Prerequisites
 
 Before proceeding, ensure that the following tools are installed and configured on your system:
 - **Docker**: You will need Docker to build and run the container.
 - **Google Chrome Browser**: This is required for running script.
 - **LinkedIn.com**: You should log in and search for positions using your criteria. *ATTENTION: The bot will only use "Easy Apply" positions.*
+
+## FLow diagram of the process
+<details>
+<summary>Click to expand</summary>
+
+```mermaid
+graph TD
+    A[Start] --> B[Get list of positions on page]
+    
+    B --> C[Process Position]
+    
+    C --> C1[Compare resume to job description]
+    C1 --> C2{Match > 70%?}
+    C2 -->|Yes| C3[Start Easy Apply Form]
+    C2 -->|No| C4[Go to next position]
+    
+    C3 --> F1[Get form field]
+    F1 --> F2{Have info in history/resume for field?}
+    F2 -->|Yes| F3[Auto-fill field]
+    F2 -->|No| F4[Wait for user input]
+    
+    F3 --> F5{More fields?}
+    F4 --> F5
+    
+    F5 -->|Yes| F1
+    F5 -->|No| F6{All required fields completed?}
+    
+    F6 -->|Yes| F7[Press Next button]
+    F6 -->|No| F4
+    
+    F7 --> C4
+    
+    C4 --> C5{More positions on page?}
+    C5 -->|Yes| C
+    C5 -->|No| D{Have next page?}
+    
+    D -->|Yes| E[Go to next page]
+    E --> B
+    D -->|No| G[End]
+```
+
+</details>
 
 ## Setting Up Chrome for Remote Debugging
 
