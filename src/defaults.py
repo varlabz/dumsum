@@ -27,20 +27,20 @@ def _embeddings():
             api_key=key,
         )
 
-    if os.environ.get("GROQ_API_KEY"):
-        print("Using Groq embeddings NO")
-        return None
+    # if os.environ.get("GROQ_API_KEY"):
+    #     print("Using Groq embeddings NO")
+    #     return None
 
-    if os.environ.get("ANTHROPIC_API_KEY"):    
-        print("Using Anthropic embeddings NO")
-        return None
+    # if os.environ.get("ANTHROPIC_API_KEY"):    
+    #     print("Using Anthropic embeddings NO")
+    #     return None
     
-    if key:=os.environ.get("JINA_API_KEY"):
-        print("Using JinaAI embeddings")
-        from langchain_community.embeddings import JinaEmbeddings
-        return JinaEmbeddings(
-            jina_api_key=key, 
-        )
+    # if key:=os.environ.get("JINA_API_KEY"):
+    #     print("Using JinaAI embeddings")
+    #     from langchain_community.embeddings import JinaEmbeddings
+    #     return JinaEmbeddings(
+    #         jina_api_key=key, 
+    #     )
 
     print("Using Ollama embeddings")
     from langchain_ollama import OllamaEmbeddings

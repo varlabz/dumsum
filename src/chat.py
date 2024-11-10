@@ -29,17 +29,6 @@ def extract_between_markers(text: str, marker1: str, marker2: str) -> str | None
     return text[start:end]
 
 def _chat():
-    if key:=os.environ.get("OPENAI_API_KEY"):
-        print("Using OpenAI")
-        from langchain_openai import ChatOpenAI
-        return ChatOpenAI(
-            api_key=key,
-            # model="gpt-4o",
-            model="gpt-4o-mini",
-            temperature=0.5,
-            seed=1234,
-        )
-    
     if key:=os.environ.get("XAI_API_KEY"):
         print("Using XAI")
         from langchain_openai import ChatOpenAI
@@ -69,13 +58,24 @@ def _chat():
             temperature=0.5,
         )
 
-    if key:=os.environ.get("JINA_API_KEY"):    
-        print("Using Jina")
-        from langchain_community.chat_models import JinaChat
-        return JinaChat(
-            jinachat_api_key=key,
+    if key:=os.environ.get("OPENAI_API_KEY"):
+        print("Using OpenAI")
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            api_key=key,
+            # model="gpt-4o",
+            model="gpt-4o-mini",
             temperature=0.5,
+            seed=1234,
         )
+    
+    # if key:=os.environ.get("JINA_API_KEY"):    
+    #     print("Using Jina")
+    #     from langchain_community.chat_models import JinaChat
+    #     return JinaChat(
+    #         jinachat_api_key=key,
+    #         temperature=0.5,
+    #     )
 
     print("Using Ollama")
     from langchain_ollama import ChatOllama
