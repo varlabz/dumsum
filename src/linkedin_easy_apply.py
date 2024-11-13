@@ -131,7 +131,7 @@ def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     print(">>> start easy apply form")
     while True:
         try:
-            page.wait_for_timeout(TIMEOUT)
+            page.wait_for_timeout(1_000) if progress == -1 else page.wait_for_timeout(TIMEOUT)
             page.wait_for_selector('div[role="dialog"]', state="visible")
             dialog = page.locator('div[role="dialog"]')
             if locator_exists(dialog, 'progress[value]'):

@@ -15,11 +15,16 @@ from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from chat import RESUME_FILE, _chat, answer, read_file_content
 from common import get_data_file
 
-DEFAULTS: Final = "data/defaults.yaml"
-DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
-DEFAULTS_USER_FILE: Final = "defaults-user.md"
-
 def _embeddings():
+    if key:=os.environ.get("GITHUB_TOKEN"):
+        print("Using GithubOpenAI embeddings")
+        from langchain_openai import OpenAIEmbeddings
+        return OpenAIEmbeddings(
+            base_url="https://models.inference.ai.azure.com",
+            model="text-embedding-3-large",
+            api_key=key,
+        )
+
     if key:=os.environ.get("OPENAI_API_KEY"):
         print("Using OpenAI embeddings")
         from langchain_openai import OpenAIEmbeddings
@@ -48,6 +53,10 @@ def _embeddings():
         model="mxbai-embed-large",
         # model="nomic-embed-text",
     )
+
+DEFAULTS: Final = "data/defaults.yaml"
+DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
+DEFAULTS_USER_FILE: Final = "defaults-user.md"
 
 class Defaults:
     def __init__(self):
@@ -116,4 +125,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if 's' in args and args.s:
         defaults = Defaults()
+        defaults.load()
         print(defaults.get(args.s, args.a if args.a else []))

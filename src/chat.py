@@ -58,15 +58,28 @@ def _chat():
             temperature=0.5,
         )
 
+    if key:=os.environ.get("GITHUB_TOKEN"):
+        # check https://github.com/marketplace/models
+        print("Using GithubOpenAI")
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            base_url="https://models.inference.ai.azure.com",
+            api_key=key,
+            model="gpt-4o",
+            # model="gpt-4o-mini",
+            temperature=0.5,
+            seed=100,
+        )
+
     if key:=os.environ.get("OPENAI_API_KEY"):
         print("Using OpenAI")
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             api_key=key,
-            # model="gpt-4o",
-            model="gpt-4o-mini",
+            model="gpt-4o",
+            # model="gpt-4o-mini",
             temperature=0.5,
-            seed=1234,
+            seed=100,
         )
     
     # if key:=os.environ.get("JINA_API_KEY"):    
@@ -85,7 +98,7 @@ def _chat():
         # model="phi3.5:latest",
         temperature=0.5,
         num_ctx=2048*4,
-        seed=123,
+        seed=100,
     )
 
 def matcher(job: str):
