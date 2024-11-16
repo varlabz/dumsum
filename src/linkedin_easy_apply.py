@@ -1,7 +1,10 @@
 from common import *
 from defaults import Defaults
 
-TIMEOUT = 1_000 if config().speed else 30_000
+def get_timeout():
+    return 1_000 if config().speed else 30_000
+
+TIMEOUT = get_timeout()
 
 def fieldset_radio(dialog, defaults: Defaults, init):
     req = dialog.locator('fieldset:has(input[type="radio"][aria-required="true"])').all()
@@ -128,6 +131,7 @@ def check_required(dialog, defaults: Defaults, init: bool):
 def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     # progress: -1 very first start, 0 - 1st page, 100 - last page
     print(">>> start easy apply form")
+    TIMEOUT = get_timeout()
     while True:
         try:
             if loc := locator_exists(page, 'button >> span:text-is("Back")'):
