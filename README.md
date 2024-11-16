@@ -128,12 +128,13 @@ or
 
    To start the Docker container, use the following command:
    ```bash
-   docker run -it --rm --net=host -v ./data:/app/data --env-file .key linkedin-pw [--matcher NUMBER]
+   docker run -it --rm --net=host -v ./data:/app/data --env-file .key linkedin-pw [--matcher NUMBER] [--speed N]
    ```
 
    **ATTENTION**: *Before running Docker, copy your updated resume.md into the local ./data directory*
    
    This command will:
+   - Run with argument --help see usage
    - Run the `linkedin-pw` container interactively (`-it`) and remove it when stopped (`--rm`).
    - Mount the local `./data` directory into the container at `/app/data`.
    - Use .key file to keep API keys:

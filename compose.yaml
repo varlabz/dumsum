@@ -1,0 +1,25 @@
+x-common-app-config: &common-app-config
+  volumes:
+    - ./data:/app/data
+  env_file:
+    - .key       
+  command: ["--matcher", "70", "--speed", "1"]      
+  restart: "no"
+  network_mode: host        
+
+services:
+  linkedin-dev:
+    build:
+      target: dev
+      dockerfile: Dockerfile
+    <<: *common-app-config       
+    volumes:
+      - $PWD:/app 
+    profiles:
+      - dev
+      
+  linkedin-final:
+    image: testlabz/linkedin-pw
+    <<: *common-app-config        
+    profiles:
+      - final
