@@ -14,7 +14,8 @@ services:
       dockerfile: Dockerfile
     <<: *common-app-config       
     volumes:
-      - $PWD:/app 
+      - ./:/app 
+    command: ["python", "src/linkedin.py", "--matcher", "70", "--speed", "1"]      
     profiles:
       - dev
       

@@ -4,6 +4,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN playwright install chromium
 
+RUN adduser --disabled-password --gecos '' appuser
+USER appuser
+
 FROM dev AS final
 COPY src/*.py ./src/
 # check code how to ignore resume.md 
