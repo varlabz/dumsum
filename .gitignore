@@ -2,5 +2,7 @@
 .venv/
 .vscode/
 .env
+.key
 .idea/
 __pycache__/
+data/defaults.yaml

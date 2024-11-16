@@ -17,6 +17,7 @@ Dockerfile
 .gitlab-ci.yml
 .travis.yml
 .env
+.key
 *.env
 # project specific
 .*

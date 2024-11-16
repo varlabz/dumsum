@@ -7,7 +7,7 @@ def delay_call(page, callback, delay=5_000):
     callback()
 
 def locator_exists(page, selector):
-    return page.locator(selector).count() > 0 and page.locator(selector)
+    return (loc := page.locator(selector)).count() > 0 and loc
 
 def optional_locator(page, field, callback):
     try:

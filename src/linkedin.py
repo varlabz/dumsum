@@ -3,7 +3,7 @@ from playwright.sync_api import sync_playwright, Playwright
 from chat import matcher
 from common import *
 from defaults import Defaults
-from linkedin_easy_apply import easy_apply_form
+import linkedin_easy_apply as easy_apply
 
 def get_job_title(page):
     if l := locator_exists(page, 'a.job-card-list__title >> span[aria-hidden="true"]'):
@@ -95,9 +95,9 @@ def job_paginator(page, defaults: Defaults, job_positions):
             # print(f">>> new page: {curr}")
             p.click()
             page.wait_for_timeout(1_000)
-            job_positions(page, defaults, easy_apply_form)
+            job_positions(page, defaults, easy_apply.easy_apply_form)
     else:
-        job_positions(page, defaults, easy_apply_form)
+        job_positions(page, defaults, easy_apply.easy_apply_form)
 
 def run(engine: Playwright):
     if hasattr(config(), 'help'):
@@ -108,12 +108,18 @@ def run(engine: Playwright):
     for page in browser.contexts[0].pages:
         if page.url.startswith('https://www.linkedin.com/jobs/'):
             print(f">>> linkedin.com/jobs/ found")
+            def back_handle_click(x, y):
+                # if back button clicked, wait for 30 seconds for review
+                print(f">>> back button clicked")
+                easy_apply.TIMEOUT = 30_000    
+            page.expose_function("back_handle_click", back_handle_click)
             defaults = Defaults()
             if config().debug_easy_apply_form:
-                easy_apply_form(page, defaults, -1)
+                defaults.load()   
+                easy_apply.easy_apply_form(page, defaults, -1)
                 return
             if config().debug_1page:
-                job_positions(page, defaults, easy_apply_form)
+                job_positions(page, defaults, easy_apply.easy_apply_form)
             else:    
                 job_paginator(page, defaults, job_positions)
             print(f"done")

@@ -127,11 +127,14 @@ def check_required(dialog, defaults: Defaults, init: bool):
 
 def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     # progress: -1 very first start, 0 - 1st page, 100 - last page
-    # click easy apply button
     print(">>> start easy apply form")
     while True:
         try:
-            page.wait_for_timeout(1_000) if progress == -1 else page.wait_for_timeout(TIMEOUT)
+            if loc := locator_exists(page, 'button >> span:text-is("Back")'):
+                print("### back")
+                loc.evaluate("(element) => element.addEventListener(\"click\", (event) => {window.back_handle_click(event.clientX, event.clientY)})")
+            time_out = 1_000 if progress == -1 else TIMEOUT
+            page.wait_for_timeout(time_out)
             page.wait_for_selector('div[role="dialog"]', state="visible")
             dialog = page.locator('div[role="dialog"]')
             if locator_exists(dialog, 'progress[value]'):
