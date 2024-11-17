@@ -37,6 +37,12 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         if locator_exists(p, 'button[aria-label$="job is dismissed, undo"]'):
             print(f">>> skip: {get_job_title(p)}")
             continue
+        if locator_exists(p, 'ul > li:has-text("Applied")'): # do not show the position again, click on cross
+            print(">>> skip: already applied")
+            if loc := locator_exists(p, 'button.job-card-container__action-small'):
+                if locator_exists(p, 'svg[data-test-icon="close-small"]'):
+                    loc.click() 
+            continue
         p.click()
         page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')

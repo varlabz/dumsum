@@ -11,7 +11,7 @@ services:
   linkedin-dev:
     build:
       target: dev
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     <<: *common-app-config       
     volumes:
       - ./:/app 
