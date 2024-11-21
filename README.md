@@ -101,7 +101,7 @@ To enable Chrome's remote debugging feature, follow these steps:
 **Build the Docker Image Locally**  
    You can build the Docker image from a local Dockerfile by using the following command:
    ```bash
-   docker build -t linkedin-pw .
+   DOCKER_BUILDKIT=1 docker build -t linkedin-pw .
    ```
    This will create an image tagged as `linkedin-pw`.
 
