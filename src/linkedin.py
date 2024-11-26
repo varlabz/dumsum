@@ -31,7 +31,7 @@ def use_matcher(job: str) -> tuple[str, bool]:
         return (0, False)
 
 def job_positions(page, defaults: Defaults, easy_apply_form):
-    plist = page.locator('ul.scaffold-layout__list-container > li.jobs-search-results__list-item').all()
+    plist = page.locator('ul > li.scaffold-layout__list-item').all()
     print(f"# positions: {len(plist)}")
     for p in plist:
         if locator_exists(p, 'button[aria-label$="job is dismissed, undo"]'):
