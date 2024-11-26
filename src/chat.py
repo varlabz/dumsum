@@ -95,7 +95,7 @@ def _chat():
     return ChatOllama(
         # model="llama3.2:3b-instruct-fp16",    
         # model="qwen2.5:7b-instruct-fp16",
-        model="granite3-dense:8b",
+        model="granite3-moe:3b-instruct-fp16",
         # model="mistral:latest",
         temperature=0.5,
         num_ctx=2048*4,

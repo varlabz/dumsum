@@ -6,14 +6,14 @@ from defaults import Defaults
 import linkedin_easy_apply as easy_apply
 
 def get_job_title(page):
-    if l := locator_exists(page, 'a.job-card-list__title >> span[aria-hidden="true"]'):
+    if l := locator_exists(page, 'a.job-card-list__title--link >> span[aria-hidden="true"]'):
         return ' '.join(l.text_content().split())
     if l := locator_exists(page, 'a.job-card-job-posting-card-wrapper__card-link'):
         return ' '.join(l.text_content().split())
     return None
 
 def set_match(page, match):
-    if l := locator_exists(page, 'a.job-card-list__title >> span[aria-hidden="true"] >> strong'):
+    if l := locator_exists(page, 'a.job-card-list__title--link >> span[aria-hidden="true"] >> strong'):
         l.evaluate(f"(element) => element.innerText += ' [{match}%]'")
 
 def use_matcher(job: str) -> tuple[str, bool]: 
