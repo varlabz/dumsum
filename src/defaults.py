@@ -12,7 +12,7 @@ from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, \
     HumanMessagePromptTemplate
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
-from chat import RESUME_FILE, _chat, answer, read_file_content
+from chat import DEFAULTS, DEFAULTS_SYSTEM_FILE, DEFAULTS_USER_FILE, RESUME_FILE, _chat, answer, read_file_content
 from common import get_data_file
 
 def _embeddings():
@@ -54,13 +54,8 @@ def _embeddings():
         # model="nomic-embed-text",
     )
 
-DEFAULTS: Final = "data/defaults.yaml"
-DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
-DEFAULTS_USER_FILE: Final = "defaults-user.md"
-
 class Defaults:
     def __init__(self):
-        self.chat = _chat()
         self.data = {}
         if not os.path.exists(DEFAULTS):
             self.save()
@@ -70,9 +65,6 @@ class Defaults:
 
     def __setitem__(self, key, value):
         self.data[key] = value
-        if embeddings := self.embeddings:
-            self.vectorstore.delete(ids=[key])
-            self.vectorstore.add_texts(texts=[f"{key}:{value}"], embedding=embeddings, ids=[key])
 
     def save(self):
         timestamp = os.path.getmtime(DEFAULTS)
@@ -87,36 +79,12 @@ class Defaults:
         with open(DEFAULTS, "r") as file:
             self.data = yaml.safe_load(file)
             self.timestamp = os.path.getmtime(DEFAULTS)
-        self.embeddings = _embeddings()
-        if self.embeddings:
-            self.vectorstore = Chroma(embedding_function=self.embeddings)
-            docs = UnstructuredMarkdownLoader(RESUME_FILE, ).load_and_split(text_splitter=MarkdownTextSplitter())
-            docs = filter_complex_metadata(docs)    # remove arrays from metadata
-            self.vectorstore.from_documents(documents=docs, embedding=self.embeddings)
-            if texts := [f"{k}:{v}" for k, v in self.data.items()]:
-                self.vectorstore.add_texts(texts=texts, embedding=self.embeddings, ids=[k for k in self.data.keys()])            
 
     def get(self, key, options: list = []) -> dict:
-        if self.embeddings is None:
-            if v := self.data.get(key, None):
-                return {"question": key, "answer": v, "explanation": "No embeddings"}
-            return None
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 3})
-        docs = retriever.invoke(key)        
-        docs = "\n".join([doc.page_content for doc in docs])
-        system = SystemMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_SYSTEM_FILE), ["CONTEXT"]).format(
-            CONTEXT=docs,)    
-        user = HumanMessagePromptTemplate.from_template_file(get_data_file(DEFAULTS_USER_FILE), ['QUESTION', 'OPTIONS']).format(
-            QUESTION=key, OPTIONS="\n".join([f"- {i}" for i in options]))
-        prompt_template = ChatPromptTemplate.from_messages([system, user])
-        try:
-            chain = prompt_template | self.chat | JsonOutputParser() 
-            res = chain.invoke({})
-            # print(res)
-            return res
-        except Exception as ex:
-            print(f"Error decoding JSON: {ex}")
-            return None
+        if v := answer(key, options):
+            self[key] = v["answer"]
+            return v
+        return None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chat with defaults")

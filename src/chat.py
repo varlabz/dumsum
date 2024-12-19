@@ -13,6 +13,9 @@ HR_FILE: Final = "hr.md"
 HR_FALLBACK_FILE: Final = "hr-fallback.md"
 SKILLS_FILE: Final = "skills.md"
 RESUME_FILE: Final = "data/resume.md"       # should use user updated resume file
+DEFAULTS: Final = "data/defaults.yaml"
+DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
+DEFAULTS_USER_FILE: Final = "defaults-user.md"
 
 def read_file_content(file_path: str) -> str | None:
     with open(file_path, 'r') as file:
@@ -36,7 +39,7 @@ def _chat():
             api_key=key,
             base_url="https://api.x.ai/v1/",
             model="grok-beta",
-            temperature=0.5,
+            temperature=0.7,
             seed=1234,
         )
 
@@ -94,17 +97,18 @@ def _chat():
     from langchain_ollama import ChatOllama
     return ChatOllama(
         # model="llama3.2:3b-instruct-fp16",    
-        # model="qwen2.5:7b-instruct-fp16",
-        model="granite3-moe:3b-instruct-fp16",
-        # model="mistral:latest",
-        temperature=0.5,
-        num_ctx=2048*4,
+        model="qwen2.5:7b-instruct-fp16",
+        # model="granite3-moe:3b-instruct-fp16",
+        # model="marco-o1:latest",
+        temperature=0.1,
+        num_ctx=8096,
         seed=100,
     )
 
 def matcher(job: str):
     chat = _chat()
-    system = SystemMessagePromptTemplate.from_template_file(get_data_file(HR_FILE), ['JOB_DESCRIPTION']).format(JOB_DESCRIPTION=job,)    
+    system = SystemMessagePromptTemplate.from_template_file(
+        get_data_file(HR_FILE), ['JOB_DESCRIPTION']).format(JOB_DESCRIPTION=job,)    
     user = HumanMessagePromptTemplate.from_template_file(RESUME_FILE, []).format()                                                       
     prompt_template = ChatPromptTemplate.from_messages([system, user])
     try:
@@ -131,10 +135,16 @@ def matcher_fallback(answer: str):
         print(f"Error decoding JSON: {ex}")
         return None    
 
-def answer(skill: str):
+def answer(skill:str, options: list = []) -> dict:
     chat = _chat()
-    system = SystemMessagePromptTemplate.from_template_file(get_data_file(SKILLS_FILE), ['RESUME']).format(RESUME=read_file_content(RESUME_FILE),)
-    user = HumanMessagePromptTemplate.from_template(skill).format()                                                       
+    system = SystemMessagePromptTemplate.from_template_file(
+        get_data_file(SKILLS_FILE), ['RESUME', 'SKILLS']).format(
+            RESUME=read_file_content(RESUME_FILE),
+            SKILLS=read_file_content(DEFAULTS), )
+    user = HumanMessagePromptTemplate.from_template_file(
+        get_data_file(DEFAULTS_USER_FILE), ['QUESTION', 'OPTIONS']).format(
+            QUESTION=skill, 
+            OPTIONS="\n".join([f"- {i}" for i in options]))
     prompt_template = ChatPromptTemplate.from_messages([system, user])
     try:
         chain = prompt_template | chat | JsonOutputParser() 
@@ -152,12 +162,13 @@ if __name__ == "__main__":
         parser.add_argument("-j", required=False, type=str, help="Job description file")
         parser.add_argument("-s", required=False, type=str, help="skill")
         parser.add_argument("-f", required=False, type=str, help="fallback")
+        parser.add_argument('-a', nargs='*', help='An array of values')
         args = parser.parse_args()
         if hasattr(args, 'j') and args.j:
             return matcher(read_file_content(args.j))
         if hasattr(args, 'f') and args.f:
             return matcher_fallback(args.f)
         if hasattr(args, 's') and args.s:
-            return answer(args.s)
+            return answer(args.s, args.a if args.a else [])
     
     print(f"{_main_chat()}")
