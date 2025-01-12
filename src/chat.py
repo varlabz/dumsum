@@ -96,13 +96,11 @@ def _chat():
     print("Using Ollama")
     from langchain_ollama import ChatOllama
     return ChatOllama(
-        # model="llama3.2:3b-instruct-fp16",    
-        model="qwen2.5:7b-instruct-fp16",
-        # model="granite3-moe:3b-instruct-fp16",
-        # model="marco-o1:latest",
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b-instruct-fp16"),
         temperature=0.1,
         num_ctx=8096,
         seed=100,
+        keep_alive="15m", 
     )
 
 def matcher(job: str):
