@@ -96,7 +96,7 @@ def _chat():
     print("Using Ollama")
     from langchain_ollama import ChatOllama
     return ChatOllama(
-        model=os.getenv("OLLAMA_MODEL", "qwen2.5:7b-instruct-fp16"),
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:latest"),
         temperature=0.1,
         num_ctx=8096,
         seed=100,
