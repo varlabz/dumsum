@@ -39,7 +39,7 @@ def _chat():
             api_key=key,
             base_url="https://api.x.ai/v1/",
             model="grok-beta",
-            temperature=0.7,
+            temperature=0.1,
             seed=1234,
         )
 
@@ -48,8 +48,9 @@ def _chat():
         from langchain_groq import ChatGroq
         return ChatGroq(
             api_key=key,
-            model="llama-3.2-3b-preview",
-            temperature=0.5,
+            # model="llama-3.2-3b-preview",
+            model="deepseek-r1-distill-llama-70b",
+            temperature=0.1,
         )
 
     if key:=os.environ.get("ANTHROPIC_API_KEY"):    
@@ -57,8 +58,8 @@ def _chat():
         from langchain_anthropic import ChatAnthropic
         return ChatAnthropic(
             api_key=key,
-            model="claude-3-haiku-20240307",
-            temperature=0.5,
+            model="claude-3-5-haiku-latest",
+            temperature=0.1,
         )
 
     if key:=os.environ.get("GITHUB_TOKEN"):
@@ -68,9 +69,10 @@ def _chat():
         return ChatOpenAI(
             base_url="https://models.inference.ai.azure.com",
             api_key=key,
-            model="gpt-4o",
+            # model="gpt-4o",
             # model="gpt-4o-mini",
-            temperature=0.5,
+            model="Llama-3.3-70B-Instruct",
+            temperature=0.1,
             seed=100,
         )
 
@@ -79,9 +81,9 @@ def _chat():
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             api_key=key,
-            model="gpt-4o",
-            # model="gpt-4o-mini",
-            temperature=0.5,
+            # model="gpt-4o",
+            model="gpt-4o-mini",
+            temperature=0.1,
             seed=100,
         )
     
