@@ -52,9 +52,9 @@ def config():
     parser.add_argument("--matcher", default=70, type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
     parser.add_argument("--matcher-ignore", default=50, type=int, required=False, help="Use resume matcher to mark as ignore. Specify a percentage (0-100) for matching threshold.")
     parser.add_argument("--speed", type=int, required=False, default=0, help="Speed of the process. 0 - slow(default), 1 - fast")
-    parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug")
-    parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug")
-    parser.add_argument("--debug-1page", action='store_true', default=False, required=False, help="Debug")
+    parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug: use 'easy apply' form to current position only")
+    parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug: show match value only")
+    parser.add_argument("--debug-1page", action='store_true', default=False, required=False, help="Debug: run 1 page only and apply to 'easy apply' position")
     args = parser.parse_args()
     return args
 

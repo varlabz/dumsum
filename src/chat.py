@@ -38,7 +38,7 @@ def _chat():
         return ChatOpenAI(
             api_key=key,
             base_url="https://api.x.ai/v1/",
-            model="grok-beta",
+            model=os.getenv("XAI_MODEL", "grok-beta"),
             temperature=0.1,
             seed=1234,
         )
@@ -49,7 +49,7 @@ def _chat():
         return ChatGroq(
             api_key=key,
             # model="llama-3.2-3b-preview",
-            model="deepseek-r1-distill-llama-70b",
+            model=os.getenv("GROQ_MODEL", "deepseek-r1-distill-llama-70b"),
             temperature=0.1,
         )
 
@@ -58,7 +58,7 @@ def _chat():
         from langchain_anthropic import ChatAnthropic
         return ChatAnthropic(
             api_key=key,
-            model="claude-3-5-haiku-latest",
+            model=os.getenv("ANTHROPIC_MODEL", "claude-3-5-haiku-latest"),
             temperature=0.1,
         )
 
@@ -70,8 +70,7 @@ def _chat():
             base_url="https://models.inference.ai.azure.com",
             api_key=key,
             # model="gpt-4o",
-            # model="gpt-4o-mini",
-            model="Llama-3.3-70B-Instruct",
+            model=os.getenv("GITHUB_MODEL", "gpt-4o-mini"),
             temperature=0.1,
             seed=100,
         )
@@ -82,18 +81,31 @@ def _chat():
         return ChatOpenAI(
             api_key=key,
             # model="gpt-4o",
-            model="gpt-4o-mini",
+            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             temperature=0.1,
             seed=100,
         )
     
-    # if key:=os.environ.get("JINA_API_KEY"):    
-    #     print("Using Jina")
-    #     from langchain_community.chat_models import JinaChat
-    #     return JinaChat(
-    #         jinachat_api_key=key,
-    #         temperature=0.5,
-    #     )
+    # print("Using Llama.cpp")
+    # import warnings
+    # from huggingface_hub import hf_hub_download
+    # from langchain_community.chat_models import ChatLlamaCpp
+    # warnings.filterwarnings("ignore", message="ggml_metal_init")
+    # warnings.filterwarnings("ignore", category=UserWarning)
+    # model_path = hf_hub_download(
+    #     repo_id="Qwen/Qwen2.5-Coder-7B-Instruct-GGUF", 
+    #     filename="qwen2.5-coder-7b-instruct-q4_0.gguf", 
+    # )
+    # return ChatLlamaCpp(
+    #     model_path=model_path,
+    #     temperature=0.1,      
+    #     n_ctx=8096,           
+    #     max_tokens=1024,      
+    #     seed=100,
+    #     verbose=False,
+    #     streaming=False,
+    #     n_gpu_layers=0,
+    # )
 
     print("Using Ollama")
     from langchain_ollama import ChatOllama
