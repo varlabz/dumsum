@@ -3,56 +3,47 @@ get/set default values key/value pair
 """
 import argparse
 import os
-from typing import Final
-from langchain_text_splitters import MarkdownHeaderTextSplitter, MarkdownTextSplitter, RecursiveCharacterTextSplitter
 import yaml
-from langchain_chroma import Chroma
-from langchain_community.vectorstores.utils import filter_complex_metadata
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, \
-    HumanMessagePromptTemplate
-from langchain_community.document_loaders import UnstructuredMarkdownLoader
-from chat import DEFAULTS, DEFAULTS_SYSTEM_FILE, DEFAULTS_USER_FILE, RESUME_FILE, _chat, answer, read_file_content
-from common import get_data_file
+from chat import DEFAULTS, answer
 
-def _embeddings():
-    if key:=os.environ.get("GITHUB_TOKEN"):
-        print("Using GithubOpenAI embeddings")
-        from langchain_openai import OpenAIEmbeddings
-        return OpenAIEmbeddings(
-            base_url="https://models.inference.ai.azure.com",
-            model="text-embedding-3-large",
-            api_key=key,
-        )
+# def _embeddings():
+#     if key:=os.environ.get("GITHUB_TOKEN"):
+#         print("Using GithubOpenAI embeddings")
+#         from langchain_openai import OpenAIEmbeddings
+#         return OpenAIEmbeddings(
+#             base_url="https://models.inference.ai.azure.com",
+#             model="text-embedding-3-large",
+#             api_key=key,
+#         )
 
-    if key:=os.environ.get("OPENAI_API_KEY"):
-        print("Using OpenAI embeddings")
-        from langchain_openai import OpenAIEmbeddings
-        return OpenAIEmbeddings(
-            api_key=key,
-        )
+#     if key:=os.environ.get("OPENAI_API_KEY"):
+#         print("Using OpenAI embeddings")
+#         from langchain_openai import OpenAIEmbeddings
+#         return OpenAIEmbeddings(
+#             api_key=key,
+#         )
 
-    # if os.environ.get("GROQ_API_KEY"):
-    #     print("Using Groq embeddings NO")
-    #     return None
+#     # if os.environ.get("GROQ_API_KEY"):
+#     #     print("Using Groq embeddings NO")
+#     #     return None
 
-    # if os.environ.get("ANTHROPIC_API_KEY"):    
-    #     print("Using Anthropic embeddings NO")
-    #     return None
+#     # if os.environ.get("ANTHROPIC_API_KEY"):    
+#     #     print("Using Anthropic embeddings NO")
+#     #     return None
     
-    # if key:=os.environ.get("JINA_API_KEY"):
-    #     print("Using JinaAI embeddings")
-    #     from langchain_community.embeddings import JinaEmbeddings
-    #     return JinaEmbeddings(
-    #         jina_api_key=key, 
-    #     )
+#     # if key:=os.environ.get("JINA_API_KEY"):
+#     #     print("Using JinaAI embeddings")
+#     #     from langchain_community.embeddings import JinaEmbeddings
+#     #     return JinaEmbeddings(
+#     #         jina_api_key=key, 
+#     #     )
 
-    print("Using Ollama embeddings")
-    from langchain_ollama import OllamaEmbeddings
-    return OllamaEmbeddings(
-        model="mxbai-embed-large",
-        # model="nomic-embed-text",
-    )
+#     print("Using Ollama embeddings")
+#     from langchain_ollama import OllamaEmbeddings
+#     return OllamaEmbeddings(
+#         model="mxbai-embed-large",
+#         # model="nomic-embed-text",
+#     )
 
 class Defaults:
     def __init__(self):

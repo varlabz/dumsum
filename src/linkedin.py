@@ -46,7 +46,10 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         p.click()
         page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')
-        job_description = detail.locator('article.jobs-description__container >> div.mt4').text_content().strip()
+        if btn := locator_exists(detail, 'button[aria-label^="see more,"]', has_text=r'show more'):
+            btn.click()
+            page.wait_for_timeout(1_000)
+        job_description = detail.locator('div.job-details-about-the-job-module__description').text_content().strip()
         print(f">>> use '{get_job_title(p)}'", )    
         (match, skip) = use_matcher(job_description)
         set_match(p, match)
@@ -55,12 +58,36 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
             print(">>> don't show position again. match is too low")
         if skip:
             continue
-        try:
-            easy_apply_btn = detail.locator("button >> span:text-is('Easy Apply')").all()[0]   # take 1st (for some reason have 2 buttons)
-        except (TimeoutError, IndexError) as ex:
+        if btn := locator_exists(detail, "button", has_text=r'Apply',):     # regex doesn't work with text
+            applied = False
+            for b in btn.all():
+                if b.text_content().strip() == 'Apply':
+                    if config().click_apply:
+                        print(">>> click apply")
+                        b.click()
+                        p.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
+                    applied = True
+                    break
+            if applied:
+                continue
+        if btn := locator_exists(detail, "button", has_text=r'Easy Apply',):    # regex doesn't work with text
+            applied = False
+            for b in btn.all():
+                if b.text_content().strip() == 'Easy Apply':
+                    if config().click_easy_apply:
+                        print(f">>> click easy apply")
+                        b.click()
+                    else:
+                        applied = True
+                    break
+            if applied:
+                continue
+        else:
+            print(">>> can't apply")
+            p.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
             continue
-        easy_apply_btn.click()
-        progress = -1   # use to track current page, if page
+        # for easy apply form
+        progress = -1   # use to track current page
         defaults.load()
         if easy_apply_form(page, defaults, progress):
             defaults.save()

@@ -135,7 +135,7 @@ def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     while True:
         try:
             if loc := locator_exists(page, 'button >> span:text-is("Back")'):
-                print("### back")
+                # print("### back")
                 loc.evaluate("(element) => element.addEventListener(\"click\", (event) => {window.back_handle_click(event.clientX, event.clientY)})")
             time_out = 1_000 if progress == -1 else TIMEOUT
             page.wait_for_timeout(time_out)

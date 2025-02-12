@@ -74,6 +74,14 @@ def _chat():
             temperature=0.1,
             seed=100,
         )
+    
+    if key:=os.environ.get("GEMINI_API_KEY"):
+        print("Using ChatGoogle")
+        from langchain_google import ChatGoogleGenerativeAI
+        return ChatGoogleGenerativeAI(
+            model='gemini-2.0-flash-exp',
+            api_key=os.getenv('GEMINI_API_KEY'),
+        )
 
     if key:=os.environ.get("OPENAI_API_KEY"):
         print("Using OpenAI")
@@ -86,26 +94,16 @@ def _chat():
             seed=100,
         )
     
-    # print("Using Llama.cpp")
-    # import warnings
-    # from huggingface_hub import hf_hub_download
-    # from langchain_community.chat_models import ChatLlamaCpp
-    # warnings.filterwarnings("ignore", message="ggml_metal_init")
-    # warnings.filterwarnings("ignore", category=UserWarning)
-    # model_path = hf_hub_download(
-    #     repo_id="Qwen/Qwen2.5-Coder-7B-Instruct-GGUF", 
-    #     filename="qwen2.5-coder-7b-instruct-q4_0.gguf", 
-    # )
-    # return ChatLlamaCpp(
-    #     model_path=model_path,
-    #     temperature=0.1,      
-    #     n_ctx=8096,           
-    #     max_tokens=1024,      
-    #     seed=100,
-    #     verbose=False,
-    #     streaming=False,
-    #     n_gpu_layers=0,
-    # )
+    if key:=os.environ.get("I_KNOW_LLAMA_CPP"):
+        from langchain_openai import ChatOpenAI
+        print("Using llama.cpp")
+        return ChatOpenAI(
+            base_url="http://localhost:8000",
+            api_key="llama-cpp",
+            model=os.getenv("LLAMA_CPP_MODEL", "Qwen2.5-7B-Instruct-1M-Q8_0.gguf"),
+            temperature=0.1,
+            seed=100,
+        )
 
     print("Using Ollama")
     from langchain_ollama import ChatOllama

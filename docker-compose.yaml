@@ -1,3 +1,11 @@
+# Usage:
+# To start the services with image from docker repo, run:
+#   docker compose --profile final up
+#
+# To build and start the services with the dev profile and use code from local directory, run:
+#   docker compose --profile dev up
+#
+
 x-common-app-config: &common-app-config
   volumes:
     - ./data:/app/data
@@ -15,7 +23,7 @@ services:
     <<: *common-app-config       
     volumes:
       - ./:/app 
-    command: ["python", "src/linkedin.py", "--matcher", "60", "--speed", "1"]      
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "60", "--speed", "1", "--debug-1page"]      
     profiles:
       - dev
       

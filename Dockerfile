@@ -15,4 +15,4 @@ ENTRYPOINT ["python", "src/linkedin.py"]
 
 LABEL description="LinkedIn Bot" \
       usage.build="docker build -t linkedin-pw ."  \
-      usage.run="docker run -it --rm --net=host -v ./data:/app/data --env-file .key linkedin-pw [--matcher NUMBER]" 
+      usage.run="docker run -it --rm --net=host -v <directory with resume>:/app/data --env-file .key linkedin-pw [--matcher NUM] [--matcher-ignore NUM] [--speed 0/1] [--click-apply] [--click-easy-apply] [--debug-easy-apply-form] [--debug-matcher] [--debug-1page]" 
