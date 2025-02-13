@@ -11,7 +11,7 @@ x-common-app-config: &common-app-config
     - ./data:/app/data
   env_file:
     - .key       
-  command: ["--matcher", "70", "--speed", "1"]      
+  command: ["--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1"]      
   restart: "no"
   network_mode: host        
 
@@ -28,7 +28,7 @@ services:
       - dev
       
   linkedin-final:
-    image: testlabz/linkedin-pw
+    image: varlabz/linkedin-pw
     <<: *common-app-config        
     profiles:
       - final

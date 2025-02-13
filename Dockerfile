@@ -11,8 +11,10 @@ FROM dev AS final
 COPY src/*.py ./src/
 # check code how to ignore resume.md 
 COPY data/*.md .            
-ENTRYPOINT ["python", "src/linkedin.py"]
+ENTRYPOINT ["python", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "0"]
 
 LABEL description="LinkedIn Bot" \
       usage.build="docker build -t linkedin-pw ."  \
-      usage.run="docker run -it --rm --net=host -v <directory with resume>:/app/data --env-file .key linkedin-pw [--matcher NUM] [--matcher-ignore NUM] [--speed 0/1] [--click-apply] [--click-easy-apply] [--debug-easy-apply-form] [--debug-matcher] [--debug-1page]" 
+      usage.run="docker run -it --rm --net=host -v <directory with resume>:/app/data \
+            --env-file .key linkedin-pw [--matcher NUM] [--matcher-ignore NUM] [--speed 0/1] [--click-apply] [--click-easy-apply] \
+            [--debug-easy-apply-form] [--debug-matcher] [--debug-1page]" 
