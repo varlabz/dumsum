@@ -120,7 +120,7 @@ or
  
    You can pull the image directly using:
    ```bash
-   docker pull testlabz/linkedin-pw
+   docker pull varlabz/linkedin-pw
    ```
 
 ## Running the Docker Container
@@ -128,7 +128,9 @@ or
 
    To start the Docker container, use the following command:
    ```bash
-   docker run -it --rm --net=host -v ./data:/app/data --env-file .key linkedin-pw [--matcher NUMBER] [--speed N]
+   docker run -it --rm --net=host -v ./<your directory>:/app/data --env-file .key linkedin-pw \
+   [--matcher NUM] [--matcher-ignore NUM] [--speed 0/1] [--click-apply] [--click-easy-apply] \
+   [--debug-easy-apply-form] [--debug-matcher] [--debug-1page]
    ```
 
    **ATTENTION**: *Before running Docker, copy your updated resume.md into the local ./data directory*
