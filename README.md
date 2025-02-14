@@ -16,7 +16,7 @@ Benefits:
 Before proceeding, ensure that the following tools are installed and configured on your system:
 - **Docker**: You will need Docker to build and run the container.
 - **Google Chrome Browser**: This is required for running script.
-- **LinkedIn.com**: You should log in and search for positions using your criteria. *ATTENTION: The bot will only use "Easy Apply" positions.*
+- **LinkedIn.com**: You should log in and search for positions using your criteria. (The bot doesn't use and save your credentials.)
 
 ## FLow diagram of the process
 <details>
@@ -164,3 +164,21 @@ For more details, check out this GitHub [discussion](https://github.com/orgs/com
 5. **Run the Bot**: Once the results load, activate the bot to automatically use the "Easy Apply" feature on listings that match your search criteria.
 
 Follow these steps to simplify and speed up your job application process!
+
+## DISCLAIMER
+
+By using this project (the "Project"), you acknowledge and agree to the following terms and conditions:
+
+**No Warranty:** The Project is provided "as is" without any warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, and non-infringement.  The authors or contributors of the Project make no representations or warranties about the accuracy, completeness, reliability, suitability, or availability with respect to the Project or the information, products, services, or related graphics contained in the Project for any purpose.  Any reliance you place on such information is therefore strictly at your own risk.
+
+**No Liability:** In no event will the authors or contributors of the Project be liable for any loss or damage including without limitation, indirect or consequential loss or damage, or any loss or damage whatsoever arising from loss of data or profits arising out of, or in connection with, the use of this Project.  This includes, but is not limited to, any errors or omissions in the content of the Project.
+
+**Non-Commercial Use:**  This Project is provided for non-commercial use only.  You may not use this Project for any commercial purpose, including but not limited to selling, licensing, or distributing the Project or any derivative works thereof for profit.
+
+**Use at Your Own Risk:** You understand and agree that you are using the Project entirely at your own risk.  You are solely responsible for any consequences, losses, or damages that may result from your use of the Project.
+
+By using the Project, you signify your acceptance of this disclaimer. If you do not agree to this disclaimer, do not use the Project.
+
+## License
+
+This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](LICENSE.md).
