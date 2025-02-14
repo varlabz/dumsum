@@ -1,5 +1,5 @@
 ## The Goal of the project
-This tool automates the LinkedIn "Easy Apply" process by:
+This tool helps you use the LinkedIn apply process by:
 - Streamlining the application workflow
 - Walking through questionnaire steps automatically
 - Reducing application submission time
