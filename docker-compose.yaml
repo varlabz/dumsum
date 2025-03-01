@@ -42,5 +42,5 @@ services:
   run-job:
     <<: *common-app-config      
     environment:
-      JOB: ${JOB}
-    command: ["python", "-u", "src/chat.py", "-j", "data/${JOB}"]      
+      JOB: ${JOB:-''}
+    command: ["python", "-u", "src/chat.py", "-j", "data/${JOB:-'create file with job description'}"]      
