@@ -75,12 +75,14 @@ def _chat():
             seed=100,
         )
     
-    if key:=os.environ.get("GEMINI_API_KEY"):
+    if key:=os.environ.get("GOOGLE_API_KEY"):
         print("Using ChatGoogle")
-        from langchain_google import ChatGoogleGenerativeAI
+        from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
-            model='gemini-2.0-flash-exp',
-            api_key=os.getenv('GEMINI_API_KEY'),
+            model=os.getenv("GOOGLE_MODEL", 'gemini-2.0-flash-exp'),
+            api_key=os.getenv('GOOGLE_API_KEY'),
+            temperature=0.1,
+            seed=100,
         )
 
     if key:=os.environ.get("OPENAI_API_KEY"):
@@ -88,18 +90,28 @@ def _chat():
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             api_key=key,
-            # model="gpt-4o",
             model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             temperature=0.1,
             seed=100,
         )
     
-    if key:=os.environ.get("I_KNOW_LLAMA_CPP"):
+    if key:=os.environ.get("GPT4FREE_KEY"):
+        print("Using Gpt4free")
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            api_key=key,
+            model=os.getenv("GPT4FREE_MODEL", "gpt-4o-mini"),
+            base_url=os.getenv("GPT4FREE_HOST", "http://localhost:8080/v1"),
+            temperature=0.1,
+            seed=100,
+        )
+    
+    if key:=os.environ.get("LLAMA_CPP_KEY"):
         from langchain_openai import ChatOpenAI
         print("Using llama.cpp")
         return ChatOpenAI(
-            base_url="http://localhost:8000",
-            api_key="llama-cpp",
+            base_url=os.getenv("LLAMA_CPP_HOST", "http://localhost:8000"),
+            api_key=key,
             model=os.getenv("LLAMA_CPP_MODEL", "Qwen2.5-7B-Instruct-1M-Q8_0.gguf"),
             temperature=0.1,
             seed=100,
@@ -108,11 +120,12 @@ def _chat():
     print("Using Ollama")
     from langchain_ollama import ChatOllama
     return ChatOllama(
-        model=os.getenv("OLLAMA_MODEL", "qwen2.5:latest"),
+        model=os.getenv("OLLAMA_MODEL", "qwen2.5:latest",),
         temperature=0.1,
         num_ctx=8096,
         seed=100,
         keep_alive="15m", 
+        base_url=os.getenv("OLLAMA_HOST", "http://localhost:11434",),
     )
 
 def matcher(job: str):

@@ -11,7 +11,7 @@ FROM dev AS final
 COPY src/*.py ./src/
 # check code how to ignore resume.md 
 COPY data/*.md .            
-ENTRYPOINT ["python", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "0"]
+CMD ["python", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "0"]
 
 LABEL description="LinkedIn Bot" \
       usage.build="docker build -t linkedin-pw ."  \

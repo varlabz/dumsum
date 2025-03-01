@@ -4,7 +4,5 @@ langchain-anthropic
 langchain-groq
 langchain-openai
 langchain-ollama
-langchain-google
-langchain-text-splitters
+langchain-google-genai
 langchain-community
-unstructured[md]

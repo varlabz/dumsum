@@ -1,34 +1,46 @@
 # Usage:
-# To start the services with image from docker repo, run:
-#   docker compose --profile final up
-#
-# To build and start the services with the dev profile and use code from local directory, run:
-#   docker compose --profile dev up
-#
 
 x-common-app-config: &common-app-config
+  image: varlabz/linkedin-pw
   volumes:
-    - ./data:/app/data
+    - ./:/app/data
   env_file:
     - .key       
-  command: ["--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1"]      
   restart: "no"
   network_mode: host        
+  profiles:
+    - final
+
+x-common-app-config-dev: &common-app-config-dev
+  build:
+    target: dev
+    dockerfile: dockerfile
+  volumes:
+    - ./:/app/
+  env_file:
+    - .key       
+  restart: "no"
+  network_mode: host        
+  profiles:
+    - dev
 
 services:
-  linkedin-dev:
-    build:
-      target: dev
-      dockerfile: dockerfile
-    <<: *common-app-config       
-    volumes:
-      - ./:/app 
-    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "60", "--speed", "1", "--debug-1page"]      
-    profiles:
-      - dev
-      
-  linkedin-final:
-    image: varlabz/linkedin-pw
+# dev services     
+  dev:
+    <<: *common-app-config-dev       
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--matcher", "70", "--speed", "1", "--debug-1page"]      
+
+# prod services     
+  run:
     <<: *common-app-config        
-    profiles:
-      - final
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1"]      
+
+  run-try:
+    <<: *common-app-config        
+    command: ["python", "-u", "src/linkedin.py", "--matcher", "70", "--speed", "1", "--debug-1page",]      
+
+  run-job:
+    <<: *common-app-config      
+    environment:
+      JOB: ${JOB}
+    command: ["python", "-u", "src/chat.py", "-j", "data/${JOB}"]      
