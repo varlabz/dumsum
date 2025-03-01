@@ -49,7 +49,10 @@ class Defaults:
     def __init__(self):
         self.data = {}
         if not os.path.exists(DEFAULTS):
-            self.save()
+            # create empty file
+            with open(DEFAULTS, "w") as file:
+                file.write("")
+                self.timestamp = os.path.getmtime(DEFAULTS)
 
     def __getitem__(self, key):
         return self.get(key)
