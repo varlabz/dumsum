@@ -95,6 +95,17 @@ def _chat():
             seed=100,
         )
     
+    if key:=os.environ.get("OPENROUTER_API_KEY"):
+        print("Using Openrouter")
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            api_key=key,
+            model=os.getenv("OPENROUTER_MODEL", "gpt-4o-mini"),
+            base_url="https://openrouter.ai/api/v1",
+            temperature=0.1,
+            seed=100,
+        )
+
     if key:=os.environ.get("GPT4FREE_KEY"):
         print("Using Gpt4free")
         from langchain_openai import ChatOpenAI
@@ -194,4 +205,8 @@ if __name__ == "__main__":
         if hasattr(args, 's') and args.s:
             return answer(args.s, args.a if args.a else [])
     
+    if os.path.exists(".key"):
+        from dotenv import load_dotenv
+        load_dotenv(".key")
+        
     print(f"{_main_chat()}")

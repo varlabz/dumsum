@@ -28,7 +28,7 @@ services:
 # dev services     
   dev:
     <<: *common-app-config-dev       
-    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--matcher", "70", "--speed", "1", "--debug-1page"]      
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1", "--debug-1page"]      
 
 # prod services     
   run:
