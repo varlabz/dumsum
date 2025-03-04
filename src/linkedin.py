@@ -160,4 +160,8 @@ def run(engine: Playwright):
     print(">>> linkedin.com/jobs/ not found")
 
 with sync_playwright() as playwright:
+    if os.path.exists(".key"):
+        from dotenv import load_dotenv
+        load_dotenv(".key")
+        
     run(playwright)
