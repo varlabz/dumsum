@@ -1,5 +1,5 @@
-## The Goal of the project
-This tool automates the job application process.
+## Project Goal
+Simplify the job application process.
 
 Benefits:
 - Faster application submissions
@@ -7,7 +7,7 @@ Benefits:
 - Reduced manual effort
 - Better time management for job seekers
 
-## Flow diagram of the process
+## Process Flow
 <details>
 <summary>Click to expand</summary>
 
@@ -46,7 +46,6 @@ graph TD
     E --> B
     D -->|No| G[End]
 ```
-
 </details>
 
 ## Running with Docker (recommended)
@@ -59,7 +58,7 @@ Instructions for setting up the development environment can be found in [DEVELOP
 
 ## Usage 
 
-1. **Log In**: Access your LinkedIn account and log in.
+1. **Log In**:  Sign in to your LinkedIn account.
 2. **Go to the Search Page**: Navigate to the job search page.
 3. **Set Filters and Criteria**: In the search fields, enter the filters and criteria (e.g., job title, location, experience level) to find relevant job listings.
 4. **Start the Search**: Click the search button to view results based on your specifications.
