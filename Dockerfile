@@ -9,7 +9,6 @@ USER appuser
 
 FROM dev AS final
 COPY src/*.py ./src/
-# check code how to ignore resume.md 
 COPY data/*.md .            
 CMD ["python", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "0"]
 

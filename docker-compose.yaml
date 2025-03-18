@@ -1,5 +1,3 @@
-# Usage:
-
 x-common-app-config: &common-app-config
   image: varlabz/linkedin-pw
   volumes:
@@ -31,7 +29,7 @@ services:
     command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1", "--debug-1page"]      
 
 # prod services     
-  run:
+  run-all:
     <<: *common-app-config        
     command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1"]      
 
@@ -48,3 +46,7 @@ services:
     environment:
       JOB: ${JOB:-''}
     command: ["python", "-u", "src/chat.py", "-j", "data/${JOB:-'create file with job description'}"]      
+
+  run-help:
+    <<: *common-app-config        
+    command: ["python", "-u", "src/linkedin.py", "--help",]      

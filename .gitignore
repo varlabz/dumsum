@@ -5,4 +5,5 @@
 .key
 .idea/
 __pycache__/
+tmp/
 data/defaults.yaml

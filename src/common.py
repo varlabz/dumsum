@@ -48,9 +48,9 @@ def get_data_file(file: str):
     raise Exception(f"File not found: {file}")
 
 def config():
-    parser = argparse.ArgumentParser(description="LinkedIn Easy Apply Bot")
-    parser.add_argument("--matcher", default=70, type=int, required=False, help="Use resume matcher to filter job positions. Specify a percentage (0-100) for matching threshold.")
-    parser.add_argument("--matcher-ignore", default=50, type=int, required=False, help="Use resume matcher to mark as ignore. Specify a percentage (0-100) for matching threshold.")
+    parser = argparse.ArgumentParser(description="LinkedIn Bot")
+    parser.add_argument("--matcher", default=70, type=int, required=False, help="Use resume matcher to filter job positions (default 70). Specify a percentage (0-100) for matching threshold.")
+    parser.add_argument("--matcher-ignore", default=50, type=int, required=False, help="Use resume matcher to mark as ignore (default 50). Specify a percentage (0-100) for matching threshold.")
     parser.add_argument("--speed", type=int, required=False, default=0, help="Speed of the process. 0 - slow(default), 1 - fast")
     parser.add_argument("--click-apply", action='store_true', default=False, required=False, help="Click to 'Apply' button")
     parser.add_argument("--click-easy-apply", action='store_true', default=False, required=False, help="Click to 'Easy Apply' button")
@@ -59,7 +59,3 @@ def config():
     parser.add_argument("--debug-1page", action='store_true', default=False, required=False, help="Debug: run 1 page only and apply to 'easy apply' position")
     args = parser.parse_args()
     return args
-
-# returning = lambda *expr: itemgetter(-1)(expr)
-# noreturn = lambda *expr: None
-

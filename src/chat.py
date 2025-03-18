@@ -79,7 +79,7 @@ def _chat():
         print("Using ChatGoogle")
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
-            model=os.getenv("GOOGLE_MODEL", 'gemini-1.5-flash'),
+            model=os.getenv("GOOGLE_MODEL", 'gemini-2.0-flash'),
             api_key=os.getenv('GOOGLE_API_KEY'),
             temperature=0.1,
             seed=100,
@@ -100,7 +100,7 @@ def _chat():
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             api_key=key,
-            model=os.getenv("OPENROUTER_MODEL", "gpt-4o-mini"),
+            model=os.getenv("OPENROUTER_MODEL", "qwen/qwq-32b:free"),
             base_url="https://openrouter.ai/api/v1",
             temperature=0.1,
             seed=100,
