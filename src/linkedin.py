@@ -123,7 +123,11 @@ def job_paginator(page, defaults: Defaults, job_positions):
                 new_pages.append(p)
             have_current = int(curr)
         # print(f"# new pages: {len(new_pages)}")    
+        max_pages = int(config().max_pages)
         for p in new_pages:
+            max_pages -= 1
+            if max_pages < 0:
+                break
             curr = int(p.get_attribute('data-test-pagination-page-btn'))
             # print(f">>> new page: {curr}")
             p.click()

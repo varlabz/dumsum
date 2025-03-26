@@ -95,6 +95,17 @@ def _chat():
             seed=100,
         )
     
+    # if key:=os.environ.get("ALIBABA_API_KEY"):
+    #     print("Using Alibaba")
+    #     from langchain_openai import ChatOpenAI
+    #     return ChatOpenAI(
+    #         api_key=key,
+    #         model=os.getenv("ALIBABA_MODEL", "qwen-turbo"),
+    #         base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+    #         temperature=0.1,
+    #         seed=100,
+    #     )
+    
     if key:=os.environ.get("OPENROUTER_API_KEY"):
         print("Using Openrouter")
         from langchain_openai import ChatOpenAI

@@ -54,6 +54,7 @@ def config():
     parser.add_argument("--speed", type=int, required=False, default=0, help="Speed of the process. 0 - slow(default), 1 - fast")
     parser.add_argument("--click-apply", action='store_true', default=False, required=False, help="Click to 'Apply' button")
     parser.add_argument("--click-easy-apply", action='store_true', default=False, required=False, help="Click to 'Easy Apply' button")
+    parser.add_argument("--max-pages", type=int, required=False, default=3, help="Max pages to process. default 3")
     parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug: use 'easy apply' form to current position only")
     parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug: show match value only")
     parser.add_argument("--debug-1page", action='store_true', default=False, required=False, help="Debug: run 1 page only and apply to 'easy apply' position")
