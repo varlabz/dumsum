@@ -4,7 +4,7 @@
 1. **Launch Google Chrome with Remote Debugging**  
    Open Terminal and run:
    ```bash
-   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --remote-debugging-port=9222
+   open -a "Google Chrome" --args --remote-debugging-port=9222
    ```
 
 ### For Windows:
