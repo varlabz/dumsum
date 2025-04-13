@@ -12,6 +12,11 @@ def get_job_title(page):
         return ' '.join(l.text_content().split())
     return None
 
+def get_job_company(page):
+    if l := locator_exists(page, 'div.artdeco-entity-lockup__subtitle'):
+        return 'Company: ' + ' '.join(l.text_content().split())
+    return ''
+
 def set_match(page, match):
     if l := locator_exists(page, 'a.job-card-list__title--link >> span[aria-hidden="true"] >> strong'):
         l.evaluate(f"(element) => element.innerText += ' [{match}%]'")
@@ -43,13 +48,15 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                 if locator_exists(p, 'svg[data-test-icon="close-small"]'):
                     loc.click() 
             continue
+        job_company = get_job_company(p)
+        # print(f"#### {job_company}")
         p.click()
         page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')
         if btn := locator_exists(detail, 'button[aria-label^="see more,"]', has_text=r'show more'):
             btn.click()
             page.wait_for_timeout(1_000)
-        job_description = detail.locator('div.job-details-about-the-job-module__description').text_content().strip()
+        job_description = ' '.join(detail.locator('div.job-details-about-the-job-module__description').text_content().strip()) + job_company
         print(f">>> use '{get_job_title(p)}'", )    
         (match, skip) = use_matcher(job_description)
         set_match(p, match)
