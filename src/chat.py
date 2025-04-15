@@ -144,7 +144,7 @@ def _chat():
     return ChatOllama(
         model=os.getenv("OLLAMA_MODEL", "qwen2.5:latest",),
         temperature=0.1,
-        num_ctx=8096,
+        num_ctx=16192,
         seed=100,
         keep_alive="15m", 
         base_url=os.getenv("OLLAMA_HOST", "http://localhost:11434",),
