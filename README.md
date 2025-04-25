@@ -7,6 +7,9 @@ Benefits:
 - Reduced manual effort
 - Better time management for job seekers
 
+
+![Match GIF](img/match.gif)
+
 ## Process Flow
 <details>
 <summary>Click to expand</summary>
