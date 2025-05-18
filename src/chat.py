@@ -117,6 +117,17 @@ def _chat():
             seed=100,
         )
 
+    if key:=os.environ.get("DEEPSEEK_API_KEY"):
+        print("Using DeepSeek")
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(
+            api_key=key,
+            model=os.getenv("DEEPSEEK_MODEL", "deepseek-chat"),
+            base_url="https://api.deepseek.com",
+            temperature=0.1,
+            seed=100,
+        )
+
     if key:=os.environ.get("GPT4FREE_KEY"):
         print("Using Gpt4free")
         from langchain_openai import ChatOpenAI
