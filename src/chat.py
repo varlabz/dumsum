@@ -82,7 +82,6 @@ def _chat():
             model=os.getenv("GOOGLE_MODEL", 'gemini-2.0-flash'),
             api_key=os.getenv('GOOGLE_API_KEY'),
             temperature=0.1,
-            seed=100,
         )
 
     if key:=os.environ.get("OPENAI_API_KEY"):

@@ -112,34 +112,20 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         print(">>> next position")
 
 def job_paginator(page, defaults: Defaults, job_positions):
-    page.wait_for_timeout(1_000)
-    if locator_exists(page, 'div.jobs-search-results-list__pagination'):
-        pages = page.locator('div.jobs-search-results-list__pagination >> li[data-test-pagination-page-btn]').all()
-        # print(f"# pages: {len(pages)}")
-        have_current = -1
-        new_pages = []
-        for p in pages:     # copy the rest links from current selection 
-            curr = int(p.get_attribute('data-test-pagination-page-btn'))
-            # print(f">>> page: {curr}")
-            if p.locator('button[aria-current="true"]').count() > 0:
-                have_current = int(curr)
-                new_pages.append(p)
-            if have_current == -1:
-                continue    
-            if curr == (have_current + 1):
-                new_pages.append(p)
-            have_current = int(curr)
-        # print(f"# new pages: {len(new_pages)}")    
+    if locator_exists(page, 'button[aria-label="View next page"]'):
         max_pages = int(config().max_pages)
-        for p in new_pages:
-            max_pages -= 1
-            if max_pages < 0:
-                break
-            curr = int(p.get_attribute('data-test-pagination-page-btn'))
-            # print(f">>> new page: {curr}")
-            p.click()
-            page.wait_for_timeout(1_000)
+        for i in range(max_pages):
+            # print(f">>> page {i} of {max_pages}")
             job_positions(page, defaults, easy_apply.easy_apply_form)
+            if i == max_pages - 1:
+                print(f">>> max pages reached: {max_pages}")
+                break
+            if next := locator_exists(page, 'button[aria-label="View next page"]'):
+                next.click()
+                page.wait_for_timeout(1_000)
+            else:
+                print(f">>> no more pages")
+                break
     else:
         job_positions(page, defaults, easy_apply.easy_apply_form)
 
