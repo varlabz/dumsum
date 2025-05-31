@@ -57,12 +57,12 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
             btn.click()
             page.wait_for_timeout(1_000)
         job_description = ' '.join(detail.locator('div.job-details-about-the-job-module__description').text_content().strip()) + job_company
-        print(f">>> use '{get_job_title(p)}'", )    
+        print(f">>> use '{get_job_title(p)}' {job_company}", )    
         (match, skip) = use_matcher(job_description)
         set_match(p, match)
         if 1 <= int(match) <= config().matcher_ignore:
             p.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
-            print(">>> don't show position again. match is too low")
+            print(">>> don't show position again. match is low")
         if skip:
             continue
         if btn := locator_exists(detail, "button", has_text=r'Apply',):     # regex doesn't work with text
