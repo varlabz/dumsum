@@ -13,6 +13,7 @@ Analyze the following areas:
 - Skills and experience
 - Education and qualifications
 - Carefully check job requirements/qualifications with input resume experience and skills.
+- Check a candidate preferences as well. 
 - Calculate an overall match percentage on a scale of 0-100%.
 
 # OUTPUT
