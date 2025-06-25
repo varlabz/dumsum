@@ -49,9 +49,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
     plist = page.locator('ul > li.scaffold-layout__list-item').all()
     # print(f"# positions: {len(plist)}")
     for p in plist:
-        p.click()
-        page.wait_for_timeout(1_000)
-
+        p.scroll_into_view_if_needed()
         job_company = get_job_company(p)
         # print(f"#### {job_company}")
         # Check if company should be filtered out 
@@ -70,6 +68,10 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                 if locator_exists(p, 'svg[data-test-icon="close-small"]'):
                     loc.click() 
             continue
+
+        p.click()
+        page.wait_for_timeout(1_000)
+
         detail = page.locator('div.scaffold-layout__detail')
         if btn := locator_exists(detail, 'button[aria-label^="see more,"]', has_text=r'show more'):
             btn.click()
