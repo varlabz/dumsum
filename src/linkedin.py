@@ -47,8 +47,20 @@ def use_matcher(job: str) -> tuple[str, bool]:
 
 def job_positions(page, defaults: Defaults, easy_apply_form):
     plist = page.locator('ul > li.scaffold-layout__list-item').all()
-    print(f"# positions: {len(plist)}")
+    # print(f"# positions: {len(plist)}")
     for p in plist:
+        p.click()
+        page.wait_for_timeout(1_000)
+
+        job_company = get_job_company(p)
+        # print(f"#### {job_company}")
+        # Check if company should be filtered out 
+        if filter_company(job_company):
+            print(f">>> skip: ignored company - {job_company}")
+            if loc := locator_exists(p, 'button.job-card-container__action-small'):
+                if locator_exists(p, 'svg[data-test-icon="close-small"]'):
+                    loc.click()
+            continue
         if locator_exists(p, 'button[aria-label$="job is dismissed, undo"]'):
             print(f">>> skip: {get_job_title(p)}")
             continue
@@ -58,20 +70,6 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                 if locator_exists(p, 'svg[data-test-icon="close-small"]'):
                     loc.click() 
             continue
-        job_company = get_job_company(p)
-        
-        # Check if company should be filtered out (if filtering is enabled)
-        if filter_company(job_company):
-            print(f">>> skip: ignored company - {job_company}")
-            # Click the dismiss button (X) to mark as "don't show anymore"
-            if loc := locator_exists(p, 'button.job-card-container__action-small'):
-                if locator_exists(p, 'svg[data-test-icon="close-small"]'):
-                    loc.click()
-            continue
-            
-        # print(f"#### {job_company}")
-        p.click()
-        page.wait_for_timeout(1_000)
         detail = page.locator('div.scaffold-layout__detail')
         if btn := locator_exists(detail, 'button[aria-label^="see more,"]', has_text=r'show more'):
             btn.click()
