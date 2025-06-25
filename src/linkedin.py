@@ -50,6 +50,8 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
     # print(f"# positions: {len(plist)}")
     for p in plist:
         p.scroll_into_view_if_needed()
+        page.wait_for_timeout(1_000)
+
         job_company = get_job_company(p)
         # print(f"#### {job_company}")
         # Check if company should be filtered out 
