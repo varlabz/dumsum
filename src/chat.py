@@ -13,6 +13,7 @@ HR_FILE: Final = "hr.md"
 HR_FALLBACK_FILE: Final = "hr-fallback.md"
 SKILLS_FILE: Final = "skills.md"
 RESUME_FILE: Final = "data/resume.md"       # should use user updated resume file
+IGNORE_FILE: Final = "data/ignore.txt"      # file with ignored companies
 DEFAULTS: Final = "data/defaults.yaml"
 DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
 DEFAULTS_USER_FILE: Final = "defaults-user.md"
@@ -153,7 +154,7 @@ def _chat():
     from langchain_ollama import ChatOllama
     return ChatOllama(
         model=os.getenv("OLLAMA_MODEL", "qwen2.5:latest",),
-        temperature=0.1,
+        temperature=0.0,
         num_ctx=16192,
         seed=100,
         keep_alive="15m", 

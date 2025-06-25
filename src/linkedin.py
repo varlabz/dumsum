@@ -1,9 +1,20 @@
 import os
 from playwright.sync_api import sync_playwright, Playwright
-from chat import matcher
+from chat import IGNORE_FILE, matcher
 from common import *
 from defaults import Defaults
 import linkedin_easy_apply as easy_apply
+
+def filter_company(job_company):
+    """Filter out ignored company and dismiss the position"""
+    ignored_companies = set()
+    if os.path.exists(IGNORE_FILE):
+        with open(IGNORE_FILE, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    ignored_companies.add(line.lower())
+    return job_company.lower() in ignored_companies
 
 def get_job_title(page):
     if l := locator_exists(page, 'a.job-card-list__title--link >> span[aria-hidden="true"]'):
@@ -12,10 +23,9 @@ def get_job_title(page):
         return ' '.join(l.text_content().split())
     return None
 
-def get_job_company(page):
+def get_job_company(page): 
     if l := locator_exists(page, 'div.artdeco-entity-lockup__subtitle'):
-        return 'Company: ' + ' '.join(l.text_content().split())
-    return ''
+        return ' '.join(l.text_content().split())
 
 def set_match(page, match):
     if l := locator_exists(page, 'a.job-card-list__title--link >> span[aria-hidden="true"] >> strong'):
@@ -49,6 +59,16 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                     loc.click() 
             continue
         job_company = get_job_company(p)
+        
+        # Check if company should be filtered out (if filtering is enabled)
+        if filter_company(job_company):
+            print(f">>> skip: ignored company - {job_company}")
+            # Click the dismiss button (X) to mark as "don't show anymore"
+            if loc := locator_exists(p, 'button.job-card-container__action-small'):
+                if locator_exists(p, 'svg[data-test-icon="close-small"]'):
+                    loc.click()
+            continue
+            
         # print(f"#### {job_company}")
         p.click()
         page.wait_for_timeout(1_000)
@@ -56,7 +76,8 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
         if btn := locator_exists(detail, 'button[aria-label^="see more,"]', has_text=r'show more'):
             btn.click()
             page.wait_for_timeout(1_000)
-        job_description = ' '.join(detail.locator('div.job-details-about-the-job-module__description').text_content().strip()) + job_company
+        job_description = ' '.join(detail.locator('div.job-details-about-the-job-module__description').text_content().strip()) + \
+            "\n\n" + "Company: "  + job_company
         print(f">>> use '{get_job_title(p)}' {job_company}", )    
         (match, skip) = use_matcher(job_description)
         set_match(p, match)
