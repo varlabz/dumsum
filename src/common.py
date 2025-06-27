@@ -1,6 +1,23 @@
 import argparse
 from operator import itemgetter
 import os
+import threading
+
+def set_interval(callback, seconds, *args, **kwargs):
+    """
+    Calls the callback every `seconds`.
+    Returns a function to cancel the timer.
+    """
+    stopped = threading.Event()
+
+    def loop():
+        while not stopped.wait(seconds):
+            callback(*args, **kwargs)
+
+    thread = threading.Thread(target=loop)
+    thread.daemon = True
+    thread.start()
+    return stopped.set
 
 def delay_call(page, callback, delay=5_000):
     page.wait_for_timeout(delay)
