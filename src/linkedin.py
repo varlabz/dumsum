@@ -49,27 +49,6 @@ def use_matcher(job: str) -> tuple[str, bool]:
     else:
         return (0, False)
 
-def threaded_continue_apply():
-    """
-    Checks for and clicks the 'Continue applying' button in a thread-safe manner
-    by creating its own Playwright connection. This is to avoid cross-thread
-    issues with Playwright's sync API.
-    """
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.connect_over_cdp(os.getenv('CDP_HOST', 'http://localhost:9222'))
-            if not browser.contexts:
-                return
-            for page in browser.contexts[0].pages:
-                if page.url.startswith('https://www.linkedin.com/jobs/'):
-                    if (button := page.locator('button', has_text=r'Continue applying')).count() > 0:
-                        print(">>> continue applying button found, clicking it.")
-                        button.click(timeout=2000)
-                    break
-    except Exception as e:
-        if "Target page, context or browser has been closed" not in str(e):
-            print(f"Error in background 'continue_apply' check: {e}")
-
 def job_positions(page, defaults: Defaults, easy_apply_form):
     plist = page.locator('ul > li.scaffold-layout__list-item').all()
     # print(f"# positions: {len(plist)}")
@@ -79,16 +58,9 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
 
         job_company = get_job_company(p)
         job_title = get_job_title(p)
-        
+
         if filter_company(job_company):
             print(f">>> skip: ignored company - {job_company}")
-            if loc := locator_exists(p, 'button.job-card-container__action-small'):
-                if locator_exists(p, 'svg[data-test-icon="close-small"]'):
-                    loc.click()
-            continue
-
-        if not jobApplicationRecords.should_apply(job_title, job_company):
-            print(f">>> skip: already applied to {job_title} at {job_company}")
             if loc := locator_exists(p, 'button.job-card-container__action-small'):
                 if locator_exists(p, 'svg[data-test-icon="close-small"]'):
                     loc.click()
@@ -103,6 +75,13 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
             if loc := locator_exists(p, 'button.job-card-container__action-small'):
                 if locator_exists(p, 'svg[data-test-icon="close-small"]'):
                     loc.click() 
+            continue
+
+        if not jobApplicationRecords.should_apply(job_title, job_company):
+            print(f">>> skip: already applied to {job_title} at {job_company}")
+            if loc := locator_exists(p, 'button.job-card-container__action-small'):
+                if locator_exists(p, 'svg[data-test-icon="close-small"]'):
+                    loc.click()
             continue
 
         p.click()
@@ -201,8 +180,11 @@ def run(engine: Playwright):
                 print(f">>> back button clicked")
                 easy_apply.TIMEOUT = 30_000    
             page.expose_function("back_handle_click", back_handle_click)
+            page.add_locator_handler(
+                page.locator('button', has_text=r'Continue applying'),
+                lambda locator: locator.click(),
+            )
             defaults = Defaults()
-            # stop_callback = set_interval(threaded_continue_apply, 6,)
             if config().debug_easy_apply_form:
                 defaults.load()   
                 easy_apply.easy_apply_form(page, defaults, -1)
@@ -211,7 +193,6 @@ def run(engine: Playwright):
                 job_positions(page, defaults, easy_apply.easy_apply_form)
             else:    
                 job_paginator(page, defaults, job_positions)
-            # stop_callback()
             print(f"done")
             return
     print(">>> linkedin.com/jobs/ not found")
