@@ -12,10 +12,9 @@ Your goal is to analyze the match between the employee and the job opportunity. 
 Analyze the following areas:
 - Skills and experience
 - Education and qualifications
-- Carefully check job requirements/qualifications with input resume experience and skills.
-- Check a candidate preferences as well. 
-- The candidate preferces have higher priority than the job requirements.
-- Calculate an overall match percentage on a scale of 0-100%.
+Carefully check job requirements/qualifications with input resume experience and skills.
+The candidate preferences have higher priority than the job requirements.
+Calculate an overall match percentage on a scale of 0-100%.
 
 # OUTPUT
 Output your final analysis in JSON format, including only the match percentage and a brief explanation.

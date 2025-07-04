@@ -13,8 +13,9 @@ HR_FILE: Final = "hr.md"
 HR_FALLBACK_FILE: Final = "hr-fallback.md"
 SKILLS_FILE: Final = "skills.md"
 RESUME_FILE: Final = "data/resume.md"       # should use user updated resume file
-IGNORE_FILE: Final = "data/ignore.txt"      # file with ignored companies
-DEFAULTS: Final = "data/defaults.yaml"
+IGNORE_FILE: Final = "data/_ignore.txt"      # file with ignored companies
+DEFAULTS: Final = "data/_defaults.yaml"
+URLS_FILE: Final = "data/_urls.txt"
 DEFAULTS_SYSTEM_FILE: Final = "defaults-system.md"
 DEFAULTS_USER_FILE: Final = "defaults-user.md"
 
@@ -60,7 +61,7 @@ def _chat():
         return ChatAnthropic(
             api_key=key,
             model=os.getenv("ANTHROPIC_MODEL", "claude-3-5-haiku-latest"),
-            temperature=0.1,
+            temperature=0.0,
         )
 
     if key:=os.environ.get("GITHUB_TOKEN"):
@@ -135,17 +136,6 @@ def _chat():
             api_key=key,
             model=os.getenv("GPT4FREE_MODEL", "gpt-4o-mini"),
             base_url=os.getenv("GPT4FREE_HOST", "http://localhost:8080/v1"),
-            temperature=0.1,
-            seed=100,
-        )
-    
-    if key:=os.environ.get("LLAMA_CPP_KEY"):
-        from langchain_openai import ChatOpenAI
-        print("Using llama.cpp")
-        return ChatOpenAI(
-            base_url=os.getenv("LLAMA_CPP_HOST", "http://localhost:8000"),
-            api_key=key,
-            model=os.getenv("LLAMA_CPP_MODEL", "Qwen2.5-7B-Instruct-1M-Q8_0.gguf"),
             temperature=0.1,
             seed=100,
         )

@@ -1,13 +1,13 @@
 import os
 from typing_extensions import Final
 from playwright.sync_api import sync_playwright, Playwright
-from chat import IGNORE_FILE, matcher
+from chat import IGNORE_FILE, URLS_FILE, matcher
 from common import *
 from defaults import Defaults
 import linkedin_easy_apply as easy_apply
-from job_application_records import JobApplicationRecords
+from job_application_records import JobApplicationRecords, JobApplicationRecordsSQLite
 
-jobApplicationRecords: Final = JobApplicationRecords()
+jobApplicationRecords: Final = JobApplicationRecordsSQLite()
 
 def filter_company(job_company):
     """Filter out ignored company and dismiss the position"""
@@ -166,36 +166,56 @@ def job_paginator(page, defaults: Defaults, job_positions):
     else:
         job_positions(page, defaults, easy_apply.easy_apply_form)
 
+def exec_page(page):
+    def back_handle_click(x, y):
+        # if back button clicked, wait for 30 seconds for review
+        print(f">>> back button clicked")
+        easy_apply.TIMEOUT = 30_000    
+    page.expose_function("back_handle_click", back_handle_click)
+    page.add_locator_handler(
+        page.locator('button', has_text=r'Continue applying'),
+        lambda locator: locator.click(),
+    )
+    defaults = Defaults()
+    if config().debug_easy_apply_form:
+        defaults.load()   
+        easy_apply.easy_apply_form(page, defaults, -1)
+        return
+    if config().debug_1page:
+        job_positions(page, defaults, easy_apply.easy_apply_form)
+    else:    
+        job_paginator(page, defaults, job_positions)
+
 def run(engine: Playwright):
+    def try_page():
+        for page in browser.contexts[0].pages:
+            if page.url.startswith('https://www.linkedin.com/jobs/'):
+                print(f">>> linkedin.com/jobs/ found")
+                exec_page(page)
+                page.close()
+                print(f"done")
+                return
+        print(">>> linkedin.com/jobs/ not found")
+        exit(1)
+    
     if hasattr(config(), 'help'):
         return
-    
+
     chromium = engine.chromium
     browser = chromium.connect_over_cdp(os.getenv('CDP_HOST', 'http://localhost:9222'))
-    for page in browser.contexts[0].pages:
-        if page.url.startswith('https://www.linkedin.com/jobs/'):
-            print(f">>> linkedin.com/jobs/ found")
-            def back_handle_click(x, y):
-                # if back button clicked, wait for 30 seconds for review
-                print(f">>> back button clicked")
-                easy_apply.TIMEOUT = 30_000    
-            page.expose_function("back_handle_click", back_handle_click)
-            page.add_locator_handler(
-                page.locator('button', has_text=r'Continue applying'),
-                lambda locator: locator.click(),
-            )
-            defaults = Defaults()
-            if config().debug_easy_apply_form:
-                defaults.load()   
-                easy_apply.easy_apply_form(page, defaults, -1)
-                return
-            if config().debug_1page:
-                job_positions(page, defaults, easy_apply.easy_apply_form)
-            else:    
-                job_paginator(page, defaults, job_positions)
-            print(f"done")
-            return
-    print(">>> linkedin.com/jobs/ not found")
+    if config().url:
+        print(f">>> open {config().url}")
+        browser.contexts[0].new_page().goto(config().url)
+        try_page()
+    elif os.path.exists(URLS_FILE):
+        with open(URLS_FILE, 'r') as file:
+            urls = [line.strip() for line in file if line.strip() and not line.startswith('#')]
+        for u in urls:
+            print(f">>> open {u}")
+            browser.contexts[0].new_page().goto(u)
+            try_page()
+    else:
+        try_page()
 
 with sync_playwright() as playwright:
     if os.path.exists(".key"):
