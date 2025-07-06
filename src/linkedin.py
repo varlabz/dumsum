@@ -207,7 +207,7 @@ def run(engine: Playwright):
         print(f">>> open {config().url}")
         browser.contexts[0].new_page().goto(config().url)
         try_page()
-    elif os.path.exists(URLS_FILE):
+    elif os.path.exists(URLS_FILE) and not config().debug_no_url:
         with open(URLS_FILE, 'r') as file:
             urls = [line.strip() for line in file if line.strip() and not line.startswith('#')]
         for u in urls:

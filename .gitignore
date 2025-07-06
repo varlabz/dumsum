@@ -9,3 +9,4 @@ tmp/
 data/defaults.yaml
 data/ignore.txt
 data/application_records.csv
+.bash_history

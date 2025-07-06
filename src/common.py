@@ -76,5 +76,6 @@ def config():
     parser.add_argument("--debug-easy-apply-form", action='store_true', default=False, required=False, help="Debug: use 'easy apply' form to current position only")
     parser.add_argument("--debug-matcher", action='store_true', default=False, required=False, help="Debug: show match value only")
     parser.add_argument("--debug-1page", action='store_true', default=False, required=False, help="Debug: run 1 page only and apply to 'easy apply' position")
+    parser.add_argument("--debug-no-url", action='store_true', default=False, required=False, help="Debug: do not use URL file")
     args = parser.parse_args()
     return args
