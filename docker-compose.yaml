@@ -1,7 +1,7 @@
 x-common-app-config: &common-app-config
   image: varlabz/linkedin-pw
   volumes:
-    - ./:/app/data
+    - ./data:/app/data
   env_file:
     - .key       
   restart: "no"
@@ -31,22 +31,22 @@ services:
 # prod services     
   run-all:
     <<: *common-app-config        
-    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1", "--max-pages", "100"]      
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher-ignore", "60", "--matcher", "70", "--speed", "1", "--max-pages", "100"]      
 
-  run-1-page:
-    <<: *common-app-config        
-    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1", "--max-pages", "1"]      
+  # run-1-page:
+  #   <<: *common-app-config        
+  #   command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher", "70", "--speed", "1", "--max-pages", "1"]      
     
-  run-try:
-    <<: *common-app-config        
-    command: ["python", "-u", "src/linkedin.py", "--matcher", "70", "--speed", "1", "--debug-1page",]      
+  # run-try:
+  #   <<: *common-app-config        
+  #   command: ["python", "-u", "src/linkedin.py", "--matcher", "70", "--speed", "1", "--debug-1page",]      
 
-  run-job:
-    <<: *common-app-config      
-    environment:
-      JOB: ${JOB:-''}
-    command: ["python", "-u", "src/chat.py", "-j", "data/${JOB:-'create file with job description'}"]      
+  # run-job:
+  #   <<: *common-app-config      
+  #   environment:
+  #     JOB: ${JOB:-''}
+  #   command: ["python", "-u", "src/chat.py", "-j", "data/${JOB:-'create file with job description'}"]      
 
-  run-help:
-    <<: *common-app-config        
-    command: ["python", "-u", "src/linkedin.py", "--help",]      
+  # run-help:
+  #   <<: *common-app-config        
+  #   command: ["python", "-u", "src/linkedin.py", "--help",]      
