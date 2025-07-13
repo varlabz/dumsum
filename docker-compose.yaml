@@ -26,12 +26,16 @@ services:
 # dev services     
   dev:
     <<: *common-app-config-dev       
-    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher-ignore", "60", "--matcher", "65", "--speed", "1", "--max-pages", "100"]      
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher-ignore", "60", "--matcher", "65", "--speed", "1", "--max-pages", "1000"]      
 
 # prod services     
-  run-all:
+  urls:
     <<: *common-app-config        
-    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher-ignore", "60", "--matcher", "70", "--speed", "1", "--max-pages", "100"]      
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher-ignore", "60", "--matcher", "70", "--speed", "1", "--max-pages", "1000"]      
+
+  current:
+    <<: *common-app-config        
+    command: ["python", "-u", "src/linkedin.py", "--click-apply", "--click-easy-apply", "--matcher-ignore", "60", "--matcher", "70", "--speed", "1", "--max-pages", "1000", "--debug-no-url"] 
 
   # run-1-page:
   #   <<: *common-app-config        
