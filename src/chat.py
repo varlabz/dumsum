@@ -12,7 +12,7 @@ from common import get_data_file
 HR_FILE: Final = "hr.md"
 HR_FALLBACK_FILE: Final = "hr-fallback.md"
 SKILLS_FILE: Final = "skills.md"
-RESUME_FILE: Final = "data/resume.md"       # should use user updated resume file
+RESUME_FILE: Final = "data/_resume.md"       # should use user updated resume file
 IGNORE_FILE: Final = "data/_ignore.txt"      # file with ignored companies
 DEFAULTS: Final = "data/_defaults.yaml"
 URLS_FILE: Final = "data/_urls.txt"
