@@ -77,6 +77,16 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                     loc.click() 
             continue
 
+        p.click()
+        page.wait_for_timeout(1_000)
+
+        detail = page.locator('div.scaffold-layout__detail')
+
+        if btn := locator_exists(detail, "button", has_text=r'Easy Apply',):    # regex doesn't work with text
+            if btn.first.is_disabled():
+                print(f">>> skip: easy apply is disabled for {job_title} at {job_company}")
+                continue
+
         if not jobApplicationRecords.should_apply(job_title, job_company):
             print(f">>> skip: already applied to {job_title} at {job_company}")
             if loc := locator_exists(p, 'button.job-card-container__action-small'):
@@ -84,14 +94,10 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                     loc.click()
             continue
 
-        p.click()
-        page.wait_for_timeout(1_000)
-
-        detail = page.locator('div.scaffold-layout__detail')
         if btn := locator_exists(detail, 'button[aria-label^="see more,"]', has_text=r'show more'):
             btn.click()
             page.wait_for_timeout(1_000)
-        job_description = "Company: "  + job_company + "\n\n" + \
+        job_description = f"Company: {job_company}\n\n" + \
             ' '.join(detail.locator('div.job-details-about-the-job-module__description').text_content().strip()) 
         print(f">>> use '{get_job_title(p)}' {job_company}", )    
         (match, skip) = use_matcher(job_description)
@@ -114,6 +120,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
                     break
             if applied:
                 continue
+            
         if btn := locator_exists(detail, "button", has_text=r'Easy Apply',):    # regex doesn't work with text
             applied = False
             for b in btn.all():
@@ -130,6 +137,7 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
             print(">>> can't apply")
             p.locator('button.job-card-container__action-small').click() # do not show the position again, click on cross
             continue
+        
         # for easy apply form
         progress = -1   # use to track current page
         defaults.load()
