@@ -50,6 +50,11 @@ def remove2(text: str):
     else:
         return text
 
+def get_label_page(page, el, ):
+    # get id from element and file label for id
+    id = el.get_attribute('id')
+    return page.locator(f"label[for='{id}']").text_content().strip()
+
 def get_label(el, ):
     if (t := el.locator('..').locator('label')).count() > 0:
         el = t

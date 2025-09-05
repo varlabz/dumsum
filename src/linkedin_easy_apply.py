@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from common import *
 from defaults import Defaults
 
@@ -114,6 +115,8 @@ def input_text(dialog, defaults: Defaults, init):
                 if v := defaults.get(label):
                     print(f">>> answer for: '{label}' is '{v}'")
                     i.fill(v['answer'])
+                    if i.get_attribute('aria-expanded') == "true":      # if expanded, click to select to first element
+                        i.press("Enter")
             val = i.input_value().strip()
             if not val:
                 print(f">>> required input is empty: '{label}'")
@@ -121,12 +124,37 @@ def input_text(dialog, defaults: Defaults, init):
             else:
                 defaults[label] = val
 
+def input_text_date(dialog, defaults: Defaults, init):
+    # print(">>> input_text_date:")
+    # special case for date input
+    req = dialog.locator('input[name="artdeco-date"]').all()
+    for i in req:
+        if i.get_attribute('placeholder') != "mm/dd/yyyy":
+            continue
+        label = get_label_page(dialog, i)
+        val = i.input_value().strip()
+        if init:
+            if val:
+                continue
+            if label.startswith("Earliest start date?"):
+                # get current date add 2 weeks and convert to mm/dd/yyyy
+                current_date = datetime.now()
+                earliest_start_date = current_date + timedelta(weeks=2)
+                v = earliest_start_date.strftime("%m/%d/%Y")
+                print(f">>> answer for: '{label}' is '{v}'")
+                i.fill(v)
+        val = i.input_value().strip()
+        if not val:
+            print(f">>> required input is empty: '{label}'")
+            dialog.page.wait_for_timeout(TIMEOUT)
+
 def check_required(dialog, defaults: Defaults, init: bool):
     fieldset_radio(dialog, defaults, init)
     fieldset_checkbox(dialog, defaults, init)
     textarea(dialog, defaults, init)
     select(dialog, defaults, init)
     input_text(dialog, defaults, init)
+    input_text_date(dialog, defaults, init)
 
 def easy_apply_form(page, defaults: Defaults, progress: int) -> bool:
     # progress: -1 very first start, 0 - 1st page, 100 - last page
