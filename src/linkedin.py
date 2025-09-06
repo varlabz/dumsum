@@ -82,8 +82,11 @@ def job_positions(page, defaults: Defaults, easy_apply_form):
 
         detail = page.locator('div.scaffold-layout__detail')
 
+        # check for condition on linkedin
+        # You’ve reached today's Easy Apply limit. Great effort applying today. We limit daily submissions to help ensure each application gets the right attention. Save this job and continue applying tomorrow.
         if btn := locator_exists(detail, "button", has_text=r'Easy Apply',):    # regex doesn't work with text
-            if btn.first.is_disabled():
+            page.wait_for_timeout(1_000)
+            if any(b.is_disabled() for b in btn.all()):
                 print(f">>> skip: easy apply is disabled for {job_title} at {job_company}")
                 continue
 
