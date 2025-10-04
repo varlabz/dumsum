@@ -115,6 +115,7 @@ def input_text(dialog, defaults: Defaults, init):
                 if v := defaults.get(label):
                     print(f">>> answer for: '{label}' is '{v}'")
                     i.fill(v['answer'])
+                    dialog.page.wait_for_timeout(1_000)
                     if i.get_attribute('aria-expanded') == "true":      # if expanded, click to select to first element
                         i.press("Enter")
             val = i.input_value().strip()
